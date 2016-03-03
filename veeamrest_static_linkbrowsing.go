@@ -10,7 +10,7 @@ type Linker interface {
 
 
 
-func (v * VeeamRestServer) FindLinkByRel(o Linker,rel string) ([]LinkType) {
+func FindLinkByRel(o Linker,rel string) ([]LinkType) {
 	links := []LinkType{}
 
 	for _,link := range o.GetLinks().Link {
@@ -20,7 +20,7 @@ func (v * VeeamRestServer) FindLinkByRel(o Linker,rel string) ([]LinkType) {
 	}
 	return links
 }
-func (v * VeeamRestServer) FindLinkByType(o Linker,typestr string) ([]LinkType) {
+func FindLinkByType(o Linker,typestr string) ([]LinkType) {
 	links := []LinkType{}
 
 	for _,link := range o.GetLinks().Link {

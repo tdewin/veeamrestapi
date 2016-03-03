@@ -115,7 +115,13 @@ func (v * VeeamRestServer) Request(vrr * VeeamRestRequest) (string,error) {
 	var returnerr error 
 	returnxml := ""
 	
-	req, err := http.NewRequest(vrr.Method, vrr.Url, nil)
+	var err error
+	var req * http.Request
+	if vrr.Post != "" {
+		req, err = http.NewRequest(vrr.Method, vrr.Url, strings.NewReader(vrr.Post))
+	} else {
+		req, err = http.NewRequest(vrr.Method, vrr.Url, nil)
+	}
 	if err == nil {
 		if v.RestSvcSessionId != "" {
 			req.Header.Add("X-RestSvcSessionId",v.RestSvcSessionId)
@@ -171,12 +177,13 @@ func (v * VeeamRestServer) GenericGetRequest(url string,o interface{}) (error) {
 	return err 
 }
 
-func (v * VeeamRestServer) GenericPostXMLRequest(url string) (string,error) {
+func (v * VeeamRestServer) GenericPostXMLRequest(url string,post string) (string,error) {
 	vrr := v.MakeRequest(v.ConstructUrl(url),"POST")
+	vrr.Post = post
 	return v.Request(vrr)				
 }
-func (v * VeeamRestServer) GenericPostRequest(url string,o interface{}) (error) {
-	xmlin,err := v.GenericPostXMLRequest(url)
+func (v * VeeamRestServer) GenericPostRequest(url string,post string,o interface{}) (error) {
+	xmlin,err := v.GenericPostXMLRequest(url,post)
 	if err == nil {	
 		err  = xml.Unmarshal([]byte(xmlin),o)
 	}
