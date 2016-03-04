@@ -117,12 +117,18 @@ func (v * VeeamRestServer) Request(vrr * VeeamRestRequest) (string,error) {
 	
 	var err error
 	var req * http.Request
+	
+	
 	if vrr.Post != "" {
 		req, err = http.NewRequest(vrr.Method, vrr.Url, strings.NewReader(vrr.Post))
 	} else {
 		req, err = http.NewRequest(vrr.Method, vrr.Url, nil)
 	}
+	
+	
 	if err == nil {
+		req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	
 		if v.RestSvcSessionId != "" {
 			req.Header.Add("X-RestSvcSessionId",v.RestSvcSessionId)
 		}
@@ -130,13 +136,16 @@ func (v * VeeamRestServer) Request(vrr * VeeamRestRequest) (string,error) {
 			req.SetBasicAuth(v.UserName,v.Password)
 		}
 		v.Logger.LogRequest(fmt.Sprintf("Contacting (%s) %s",vrr.Method, vrr.Url))
+		if vrr.Post != "" {
+			v.Logger.LogRequest("Posting "+vrr.Post)
+		}
 		resp, err := v.Client.Do(req)
 		if err == nil {
 			defer resp.Body.Close() 
+			xmlin,err := ReadStringFromReader(resp.Body)
+			v.Logger.LogResponse(resp.StatusCode,xmlin)
 			if resp.StatusCode < 400 {
-				xmlin,err := ReadStringFromReader(resp.Body)
 				if err == nil {
-					v.Logger.LogResponse(resp.StatusCode,xmlin)
 					returnxml = xmlin
 					
 					restsessionid := ""
@@ -189,6 +198,10 @@ func (v * VeeamRestServer) GenericPostRequest(url string,post string,o interface
 	}
 	return err 
 }
+func MarshalForPost(v interface{}) (string) {
+	marshal,_ := xml.MarshalIndent(v,"","  ")
+	return xml.Header +string(marshal)
+}
 
 func (v * VeeamRestServer) HeartbeatSession() (bool) {
 	if (v.Client == nil) { v.Init()}
@@ -225,7 +238,7 @@ func (v * VeeamRestServer) Authenticate() (error) {
 				var sv * SupportedVersionType
 				for _,t := range entmgr.SupportedVersions.SupportedVersion {
 					if t.Name == "v1_2" {
-						sv = &t
+						sv = t
 					}
 				}
 				if sv != nil {

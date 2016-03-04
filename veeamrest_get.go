@@ -1087,27 +1087,7 @@ func (v * VeeamRestServer) GetReplicaTaskSessions() (ReplicaTaskSessionEntityLis
 }
 
 
-/*
- * QueryResult 
- * Not validated 
- */
-func (v * VeeamRestServer) GetQueryResult(idstring string) (QueryResultType,error) { 
-  var returnerr error 
-  QueryResult := QueryResultType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","QueryResult",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&QueryResult)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error QueryResult",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking QueryResult",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return QueryResult,returnerr
-}
+
 
 
 /*
@@ -1478,73 +1458,10 @@ func (v * VeeamRestServer) GetHierarchyItems() (HierarchyItemListType,error) {
 }
 
 
-/*
- * QuerySvc 
- * Not validated 
- */
-func (v * VeeamRestServer) GetQuerySvc(idstring string) (QuerySvcType,error) { 
-  var returnerr error 
-  QuerySvc := QuerySvcType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","QuerySvc",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&QuerySvc)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error QuerySvc",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking QuerySvc",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return QuerySvc,returnerr
-}
 
 
-/*
- * LookupSvc 
- * Not validated 
- */
-func (v * VeeamRestServer) GetLookupSvc(idstring string) (LookupSvcType,error) { 
-  var returnerr error 
-  LookupSvc := LookupSvcType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","LookupSvc",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&LookupSvc)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error LookupSvc",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking LookupSvc",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return LookupSvc,returnerr
-}
 
 
-/*
- * ReportingSvc 
- * Not validated 
- */
-func (v * VeeamRestServer) GetReportingSvc(idstring string) (ReportingSvcType,error) { 
-  var returnerr error 
-  ReportingSvc := ReportingSvcType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","ReportingSvc",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&ReportingSvc)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error ReportingSvc",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking ReportingSvc",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return ReportingSvc,returnerr
-}
 
 
 /*

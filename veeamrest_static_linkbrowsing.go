@@ -10,8 +10,8 @@ type Linker interface {
 
 
 
-func FindLinkByRel(o Linker,rel string) ([]LinkType) {
-	links := []LinkType{}
+func FindLinkByRel(o Linker,rel string) ([]*LinkType) {
+	links := []*LinkType{}
 
 	for _,link := range o.GetLinks().Link {
 		if strings.EqualFold(rel,link.Rel) {
@@ -20,8 +20,8 @@ func FindLinkByRel(o Linker,rel string) ([]LinkType) {
 	}
 	return links
 }
-func FindLinkByType(o Linker,typestr string) ([]LinkType) {
-	links := []LinkType{}
+func FindLinkByType(o Linker,typestr string) ([]*LinkType) {
+	links := []*LinkType{}
 
 	for _,link := range o.GetLinks().Link {
 		if strings.EqualFold(typestr,link.Type) {
