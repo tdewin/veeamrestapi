@@ -12,8 +12,8 @@ import (
  */
 type LoginSpecType struct { 
    XMLName xml.Name
-   VMwareSSOToken string `xml:"VMwareSSOToken"`
-   TenantCredentials *TenantCredentialsInfoType `xml:"TenantCredentials"`
+   VMwareSSOToken string `xml:"VMwareSSOToken,omitempty"`
+   TenantCredentials *TenantCredentialsInfoType `xml:"TenantCredentials,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -40,10 +40,10 @@ type LogonSessionListType struct {
  */
 type LogonSessionType struct { 
    XMLName xml.Name
-   UserName string `xml:"UserName"`
-   SessionId string `xml:"SessionId"`
+   UserName string `xml:"UserName,omitempty"`
+   SessionId string `xml:"SessionId,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -57,7 +57,7 @@ type SummaryReportType struct {
    XMLName xml.Name
    //Inhereting from ReportResourceType
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -78,7 +78,7 @@ type OverviewReportFrameType struct {
    WarningVmLastestStates int `xml:"WarningVmLastestStates"`
    FailedVmLastestStates int `xml:"FailedVmLastestStates"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -101,7 +101,7 @@ type VmsOverviewReportFrameType struct {
    SuccessBackupPercents int `xml:"SuccessBackupPercents"`
    ProtectedVmsReportLink string `xml:"ProtectedVmsReportLink"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -128,7 +128,7 @@ type JobStatisticsReportFrameType struct {
    MaxDurationReplicaJobName string `xml:"MaxDurationReplicaJobName"`
    BackupJobStatusReportLink string `xml:"BackupJobStatusReportLink"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -151,7 +151,7 @@ type RepositoryReportFrameType struct {
    Period []*RepositoryReportFrameTypeNestedPeriod `xml:"Period"`
    CapacityPlanningReportLink string `xml:"CapacityPlanningReportLink,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -177,7 +177,7 @@ type ProcessedVmsReportFrameType struct {
    XMLName xml.Name
    Day []*ProcessedVmsReportFrameTypeNestedDay `xml:"Day"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -202,7 +202,7 @@ type EnterpriseManagerType struct {
    XMLName xml.Name
    SupportedVersions *SupportedVersionListType `xml:"SupportedVersions"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -245,7 +245,7 @@ type ListType struct {
 type ReportResourceType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -290,7 +290,7 @@ type ReferenceType struct {
  */
 type ResourceType struct { 
    XMLName xml.Name
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -305,7 +305,7 @@ type EntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -392,7 +392,7 @@ type EntityReferenceListType struct {
  */
 type EntityReferenceType struct { 
    XMLName xml.Name
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    UID UidType `xml:"UID,attr"`
    Name string `xml:"Name,attr"`
    Href UrlType `xml:"Href,attr"`
@@ -433,7 +433,7 @@ type BackupServerEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -451,7 +451,7 @@ type ManagedServerEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -465,7 +465,7 @@ type BackupServerSpecType struct {
    XMLName xml.Name
    Description string `xml:"Description"`
    DnsNameOrIpAddress string `xml:"DnsNameOrIpAddress"`
-   Port uint16 `xml:"Port"`
+   Port uint16 `xml:"Port,omitempty"`
    Username string `xml:"Username"`
    Password string `xml:"Password"`
    //Inhereting from SpecType
@@ -488,7 +488,7 @@ type JobSessionEntityType struct {
    JobName string `xml:"JobName"`
    JobType string `xml:"JobType"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -497,7 +497,7 @@ type JobSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -515,7 +515,7 @@ type BackupJobSessionEntityType struct {
    JobName string `xml:"JobName"`
    JobType string `xml:"JobType"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -524,7 +524,7 @@ type BackupJobSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -542,7 +542,7 @@ type ReplicaJobSessionEntityType struct {
    JobName string `xml:"JobName"`
    JobType string `xml:"JobType"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -551,7 +551,7 @@ type ReplicaJobSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -563,14 +563,14 @@ func (l ReplicaJobSessionEntityType) GetLinks() (*LinkListType) { return (l.Link
  */
 type RestoreSessionEntityType struct { 
    XMLName xml.Name
-   RestoredObjRef HierarchyObjRefType `xml:"RestoredObjRef"`
+   RestoredObjRef HierarchyObjRefType `xml:"RestoredObjRef,omitempty"`
    VmDisplayName string `xml:"VmDisplayName,attr"`
    //Inhereting from JobSessionEntityType
    JobUid UidType `xml:"JobUid"`
    JobName string `xml:"JobName"`
    JobType string `xml:"JobType"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -579,7 +579,7 @@ type RestoreSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -593,7 +593,7 @@ type BackupTaskSessionEntityType struct {
    XMLName xml.Name
    JobSessionUid UidType `xml:"JobSessionUid"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Reason string `xml:"Reason"`
@@ -603,7 +603,7 @@ type BackupTaskSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -627,7 +627,7 @@ type ReplicaTaskSessionEntityType struct {
    XMLName xml.Name
    JobSessionUid UidType `xml:"JobSessionUid"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Reason string `xml:"Reason"`
@@ -637,7 +637,7 @@ type ReplicaTaskSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -671,11 +671,11 @@ type PlainCredentialsType struct {
 type CredentialsInfoType struct { 
    XMLName xml.Name
    Id string `xml:"Id"`
-   Username string `xml:"Username"`
-   Description string `xml:"Description"`
-   Password string `xml:"Password"`
+   Username string `xml:"Username,omitempty"`
+   Description string `xml:"Description,omitempty"`
+   Password string `xml:"Password,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -697,9 +697,9 @@ type CredentialsInfoListType struct {
  */
 type CredentialsInfoSpecType struct { 
    XMLName xml.Name
-   Username string `xml:"Username"`
-   Description string `xml:"Description"`
-   Password string `xml:"Password"`
+   Username string `xml:"Username,omitempty"`
+   Description string `xml:"Description,omitempty"`
+   Password string `xml:"Password,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -720,7 +720,7 @@ type PasswordKeyInfoType struct {
    Hint string `xml:"Hint"`
    LastModificationDate DateTime `xml:"LastModificationDate"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -742,8 +742,8 @@ type PasswordKeyInfoListType struct {
  */
 type PasswordKeyInfoSpecType struct { 
    XMLName xml.Name
-   Hint string `xml:"Hint"`
-   Password string `xml:"Password"`
+   Hint string `xml:"Hint,omitempty"`
+   Password string `xml:"Password,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -780,19 +780,19 @@ type FailoverPlanEntityListType struct {
  */
 type JobEntityType struct { 
    XMLName xml.Name
-   JobType string `xml:"JobType"`
-   Platform string `xml:"Platform"`
-   Description string `xml:"Description"`
-   ScheduleConfigured bool `xml:"ScheduleConfigured"`
-   ScheduleEnabled bool `xml:"ScheduleEnabled"`
-   NextRun DateTime `xml:"NextRun"`
-   JobScheduleOptions *JobScheduleOptionsInfoType `xml:"JobScheduleOptions"`
-   JobInfo *JobEntityTypeNestedJobInfo `xml:"JobInfo"`
+   JobType string `xml:"JobType,omitempty"`
+   Platform string `xml:"Platform,omitempty"`
+   Description string `xml:"Description,omitempty"`
+   ScheduleConfigured bool `xml:"ScheduleConfigured,omitempty"`
+   ScheduleEnabled bool `xml:"ScheduleEnabled,omitempty"`
+   NextRun DateTime `xml:"NextRun,omitempty"`
+   JobScheduleOptions *JobScheduleOptionsInfoType `xml:"JobScheduleOptions,omitempty"`
+   JobInfo *JobEntityTypeNestedJobInfo `xml:"JobInfo,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -815,13 +815,13 @@ type JobEntityTypeNestedJobInfo struct {
  */
 type FailoverPlanEntityType struct { 
    XMLName xml.Name
-   Description string `xml:"Description"`
+   Description string `xml:"Description,omitempty"`
    FailoverPlanInfo *FailoverPlanInfoType `xml:"FailoverPlanInfo"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -869,9 +869,9 @@ func NewFailoverPlanManagementSpecType() (*FailoverPlanManagementSpecType) {
  */
 type BackupJobInfoType struct { 
    XMLName xml.Name
-   Includes *ObjectInJobListType `xml:"Includes"`
-   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions"`
-   AdvancedStorageOptions *AdvancedStorageOptionsType `xml:"AdvancedStorageOptions"`
+   Includes *ObjectInJobListType `xml:"Includes,omitempty"`
+   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions,omitempty"`
+   AdvancedStorageOptions *AdvancedStorageOptionsType `xml:"AdvancedStorageOptions,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -881,7 +881,7 @@ type BackupJobInfoType struct {
  */
 type FailoverPlanInfoType struct { 
    XMLName xml.Name
-   Includes *FailoveredVmListType `xml:"Includes"`
+   Includes *FailoveredVmListType `xml:"Includes,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -911,14 +911,14 @@ type FailoveredVmListType struct {
  */
 type ObjectInJobType struct { 
    XMLName xml.Name
-   ObjectInJobId string `xml:"ObjectInJobId"`
-   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef"`
-   Name string `xml:"Name"`
+   ObjectInJobId string `xml:"ObjectInJobId,omitempty"`
+   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef,omitempty"`
+   Name string `xml:"Name,omitempty"`
    DisplayName string `xml:"DisplayName"`
-   Order int `xml:"Order"`
+   Order int `xml:"Order,omitempty"`
    GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -930,14 +930,14 @@ func (l ObjectInJobType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type FailoveredVmType struct { 
    XMLName xml.Name
-   FailoveredVmId string `xml:"FailoveredVmId"`
-   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef"`
-   Name string `xml:"Name"`
+   FailoveredVmId string `xml:"FailoveredVmId,omitempty"`
+   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef,omitempty"`
+   Name string `xml:"Name,omitempty"`
    DisplayName string `xml:"DisplayName"`
-   Order int `xml:"Order"`
+   Order int `xml:"Order,omitempty"`
    GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -949,10 +949,10 @@ func (l FailoveredVmType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type CreateObjectInJobSpecType struct { 
    XMLName xml.Name
-   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef"`
-   HierarchyObjName string `xml:"HierarchyObjName"`
-   Order int `xml:"Order"`
-   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions"`
+   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef,omitempty"`
+   HierarchyObjName string `xml:"HierarchyObjName,omitempty"`
+   Order int `xml:"Order,omitempty"`
+   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -987,19 +987,19 @@ type JobItemVssOptionsType struct {
  */
 type GuestProcessingOptionsType struct { 
    XMLName xml.Name
-   AppAwareProcessingMode string `xml:"AppAwareProcessingMode"`
-   FileSystemIndexingMode string `xml:"FileSystemIndexingMode"`
-   IncludedIndexingFolders *StringListType `xml:"IncludedIndexingFolders"`
-   ExcludedIndexingFolders *StringListType `xml:"ExcludedIndexingFolders"`
-   CredentialsId string `xml:"CredentialsId"`
-   VssSnapshotOptions *VssSnapshotOptionsType `xml:"VssSnapshotOptions"`
-   WindowsGuestFSIndexingOptions *WindowsGuestFSIndexingOptionsType `xml:"WindowsGuestFSIndexingOptions"`
-   LinuxGuestFSIndexingOptions *LinuxGuestFSIndexingOptionsType `xml:"LinuxGuestFSIndexingOptions"`
-   SqlBackupOptions *SqlBackupOptionsType `xml:"SqlBackupOptions"`
-   WindowsCredentialsId string `xml:"WindowsCredentialsId"`
-   LinuxCredentialsId string `xml:"LinuxCredentialsId"`
-   FSFileExcludeOptions *FSFileExcludeOptionsType `xml:"FSFileExcludeOptions"`
-   OracleBackupOptions *OracleBackupOptionsType `xml:"OracleBackupOptions"`
+   AppAwareProcessingMode string `xml:"AppAwareProcessingMode,omitempty"`
+   FileSystemIndexingMode string `xml:"FileSystemIndexingMode,omitempty"`
+   IncludedIndexingFolders *StringListType `xml:"IncludedIndexingFolders,omitempty"`
+   ExcludedIndexingFolders *StringListType `xml:"ExcludedIndexingFolders,omitempty"`
+   CredentialsId string `xml:"CredentialsId,omitempty"`
+   VssSnapshotOptions *VssSnapshotOptionsType `xml:"VssSnapshotOptions,omitempty"`
+   WindowsGuestFSIndexingOptions *WindowsGuestFSIndexingOptionsType `xml:"WindowsGuestFSIndexingOptions,omitempty"`
+   LinuxGuestFSIndexingOptions *LinuxGuestFSIndexingOptionsType `xml:"LinuxGuestFSIndexingOptions,omitempty"`
+   SqlBackupOptions *SqlBackupOptionsType `xml:"SqlBackupOptions,omitempty"`
+   WindowsCredentialsId string `xml:"WindowsCredentialsId,omitempty"`
+   LinuxCredentialsId string `xml:"LinuxCredentialsId,omitempty"`
+   FSFileExcludeOptions *FSFileExcludeOptionsType `xml:"FSFileExcludeOptions,omitempty"`
+   OracleBackupOptions *OracleBackupOptionsType `xml:"OracleBackupOptions,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1010,7 +1010,7 @@ type GuestProcessingOptionsType struct {
 type VssSnapshotOptionsType struct { 
    XMLName xml.Name
    VssSnapshotMode string `xml:"VssSnapshotMode"`
-   IsCopyOnly bool `xml:"IsCopyOnly"`
+   IsCopyOnly bool `xml:"IsCopyOnly,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1045,9 +1045,9 @@ type LinuxGuestFSIndexingOptionsType struct {
 type SqlBackupOptionsType struct { 
    XMLName xml.Name
    TransactionLogsProcessing string `xml:"TransactionLogsProcessing"`
-   BackupLogsFrequencyMin int `xml:"BackupLogsFrequencyMin"`
-   UseDbBackupRetention bool `xml:"UseDbBackupRetention"`
-   RetainDays int `xml:"RetainDays"`
+   BackupLogsFrequencyMin int `xml:"BackupLogsFrequencyMin,omitempty"`
+   UseDbBackupRetention bool `xml:"UseDbBackupRetention,omitempty"`
+   RetainDays int `xml:"RetainDays,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1057,7 +1057,7 @@ type SqlBackupOptionsType struct {
  */
 type AdvancedStorageOptionsType struct { 
    XMLName xml.Name
-   PasswordKeyId string `xml:"PasswordKeyId"`
+   PasswordKeyId string `xml:"PasswordKeyId,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1080,12 +1080,12 @@ type FSFileExcludeOptionsType struct {
 type OracleBackupOptionsType struct { 
    XMLName xml.Name
    BackupLogsEnabled bool `xml:"BackupLogsEnabled"`
-   BackupLogsFrequencyMin int `xml:"BackupLogsFrequencyMin"`
-   UseDbBackupRetention bool `xml:"UseDbBackupRetention"`
-   RetainDays int `xml:"RetainDays"`
+   BackupLogsFrequencyMin int `xml:"BackupLogsFrequencyMin,omitempty"`
+   UseDbBackupRetention bool `xml:"UseDbBackupRetention,omitempty"`
+   RetainDays int `xml:"RetainDays,omitempty"`
    ArchivedLogsTruncation string `xml:"ArchivedLogsTruncation"`
-   ArchivedLogsMaxAgeHours int `xml:"ArchivedLogsMaxAgeHours"`
-   ArchivedLogsMaxSizeMb int `xml:"ArchivedLogsMaxSizeMb"`
+   ArchivedLogsMaxAgeHours int `xml:"ArchivedLogsMaxAgeHours,omitempty"`
+   ArchivedLogsMaxSizeMb int `xml:"ArchivedLogsMaxSizeMb,omitempty"`
    SysdbaCredsId string `xml:"SysdbaCredsId"`
    ProxyAutoSelect bool `xml:"ProxyAutoSelect"`
    //Inhereting from InfoType
@@ -1106,15 +1106,15 @@ type StringListType struct {
  */
 type JobScheduleOptionsInfoType struct { 
    XMLName xml.Name
-   RetryOptions *JobScheduleRetryOptionsType `xml:"RetryOptions"`
-   WaitForBackupCompletion bool `xml:"WaitForBackupCompletion"`
-   BackupCompetitionWaitingPeriodMin int `xml:"BackupCompetitionWaitingPeriodMin"`
-   OptionsDaily *JobScheduleDailyOptionsType `xml:"OptionsDaily"`
-   OptionsMonthly *JobScheduleMonthlyOptionsType `xml:"OptionsMonthly"`
-   OptionsPeriodically *JobSchedulePeriodicallyOptionsType `xml:"OptionsPeriodically"`
-   OptionsContinuous *JobScheduleContinuousOptionsType `xml:"OptionsContinuous"`
-   OptionsBackupWindow *JobScheduleBackupWindowOptionsType `xml:"OptionsBackupWindow"`
-   OptionsDaisyChaining *JobScheduleDaisyChainingOptionsType `xml:"OptionsDaisyChaining"`
+   RetryOptions *JobScheduleRetryOptionsType `xml:"RetryOptions,omitempty"`
+   WaitForBackupCompletion bool `xml:"WaitForBackupCompletion,omitempty"`
+   BackupCompetitionWaitingPeriodMin int `xml:"BackupCompetitionWaitingPeriodMin,omitempty"`
+   OptionsDaily *JobScheduleDailyOptionsType `xml:"OptionsDaily,omitempty"`
+   OptionsMonthly *JobScheduleMonthlyOptionsType `xml:"OptionsMonthly,omitempty"`
+   OptionsPeriodically *JobSchedulePeriodicallyOptionsType `xml:"OptionsPeriodically,omitempty"`
+   OptionsContinuous *JobScheduleContinuousOptionsType `xml:"OptionsContinuous,omitempty"`
+   OptionsBackupWindow *JobScheduleBackupWindowOptionsType `xml:"OptionsBackupWindow,omitempty"`
+   OptionsDaisyChaining *JobScheduleDaisyChainingOptionsType `xml:"OptionsDaisyChaining,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1124,9 +1124,9 @@ type JobScheduleOptionsInfoType struct {
  */
 type JobScheduleRetryOptionsType struct { 
    XMLName xml.Name
-   RetryTimes int `xml:"RetryTimes"`
-   RetryTimeout int `xml:"RetryTimeout"`
-   RetrySpecified bool `xml:"RetrySpecified"`
+   RetryTimes int `xml:"RetryTimes,omitempty"`
+   RetryTimeout int `xml:"RetryTimeout,omitempty"`
+   RetrySpecified bool `xml:"RetrySpecified,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1136,10 +1136,10 @@ type JobScheduleRetryOptionsType struct {
  */
 type JobScheduleDailyOptionsType struct { 
    XMLName xml.Name
-   Kind string `xml:"Kind"`
-   Days DaysOfWeekEnumeration `xml:"Days"`
-   Time Time `xml:"Time"`
-   TimeOffsetUtc int `xml:"TimeOffsetUtc"`
+   Kind string `xml:"Kind,omitempty"`
+   Days []DaysOfWeekEnumeration `xml:"Days"`
+   Time Time `xml:"Time,omitempty"`
+   TimeOffsetUtc int `xml:"TimeOffsetUtc,omitempty"`
    Enabled bool `xml:"Enabled,attr"`
    //Inhereting from InfoType
 }
@@ -1150,12 +1150,12 @@ type JobScheduleDailyOptionsType struct {
  */
 type JobScheduleMonthlyOptionsType struct { 
    XMLName xml.Name
-   Time Time `xml:"Time"`
-   TimeOffsetUtc int `xml:"TimeOffsetUtc"`
-   DayNumberInMonth string `xml:"DayNumberInMonth"`
-   DayOfWeek string `xml:"DayOfWeek"`
-   Months JobScheduleMonthEnumeration `xml:"Months"`
-   DayOfMonth int `xml:"DayOfMonth"`
+   Time Time `xml:"Time,omitempty"`
+   TimeOffsetUtc int `xml:"TimeOffsetUtc,omitempty"`
+   DayNumberInMonth string `xml:"DayNumberInMonth,omitempty"`
+   DayOfWeek string `xml:"DayOfWeek,omitempty"`
+   Months []JobScheduleMonthEnumeration `xml:"Months"`
+   DayOfMonth int `xml:"DayOfMonth,omitempty"`
    Enabled bool `xml:"Enabled,attr"`
    //Inhereting from InfoType
 }
@@ -1166,9 +1166,9 @@ type JobScheduleMonthlyOptionsType struct {
  */
 type JobSchedulePeriodicallyOptionsType struct { 
    XMLName xml.Name
-   Kind string `xml:"Kind"`
-   FullPeriod int `xml:"FullPeriod"`
-   Schedule *TimePeriodsType `xml:"Schedule"`
+   Kind string `xml:"Kind,omitempty"`
+   FullPeriod int `xml:"FullPeriod,omitempty"`
+   Schedule *TimePeriodsType `xml:"Schedule,omitempty"`
    Enabled bool `xml:"Enabled,attr"`
    //Inhereting from InfoType
 }
@@ -1239,8 +1239,8 @@ type FileCopyJobInfoType struct {
  */
 type ReplicaJobInfoType struct { 
    XMLName xml.Name
-   Includes *ObjectInJobListType `xml:"Includes"`
-   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions"`
+   Includes *ObjectInJobListType `xml:"Includes,omitempty"`
+   GuestProcessingOptions *GuestProcessingOptionsType `xml:"GuestProcessingOptions,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1250,12 +1250,12 @@ type ReplicaJobInfoType struct {
  */
 type TaskType struct { 
    XMLName xml.Name
-   TaskId string `xml:"TaskId"`
-   State string `xml:"State"`
-   Operation string `xml:"Operation"`
-   Result *TaskResultInfoType `xml:"Result"`
+   TaskId string `xml:"TaskId,omitempty"`
+   State string `xml:"State,omitempty"`
+   Operation string `xml:"Operation,omitempty"`
+   Result *TaskResultInfoType `xml:"Result,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1280,8 +1280,8 @@ type QueryResultType struct {
    Refs *EntityReferenceListType `xml:"Refs,omitempty"`
    Entities *EntitiesType `xml:"Entities,omitempty"`
    Resources *ResourcesType `xml:"Resources,omitempty"`
-   Links *LinkListType `xml:"Links"`
-   PagingInfo *PagingInfoType `xml:"PagingInfo"`
+   Links *LinkListType `xml:"Links,omitempty"`
+   PagingInfo *PagingInfoType `xml:"PagingInfo,omitempty"`
 }
 func (l QueryResultType) GetLinks() (*LinkListType) { return (l.Links) }
 
@@ -1291,7 +1291,7 @@ func (l QueryResultType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type PagingInfoType struct { 
    XMLName xml.Name
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    PageNum int `xml:"PageNum,attr"`
    PageSize int `xml:"PageSize,attr"`
    PagesCount int `xml:"PagesCount,attr"`
@@ -1306,12 +1306,12 @@ func (l PagingInfoType) GetLinks() (*LinkListType) { return (l.Links) }
 type BackupEntityType struct { 
    XMLName xml.Name
    Ref *EntityReferenceType `xml:"Ref"`
-   Platform string `xml:"Platform"`
+   Platform string `xml:"Platform,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1334,12 +1334,12 @@ type BackupEntityListType struct {
 type ReplicaEntityType struct { 
    XMLName xml.Name
    Ref *EntityReferenceType `xml:"Ref"`
-   Platform string `xml:"Platform"`
+   Platform string `xml:"Platform,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1367,7 +1367,7 @@ type RestorePointEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1393,14 +1393,14 @@ type VmRestorePointEntityType struct {
    VmName string `xml:"VmName"`
    Algorithm string `xml:"Algorithm"`
    PointType string `xml:"PointType"`
-   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef"`
-   SqlInfo *VmRestorePointSqlInfoType `xml:"SqlInfo"`
+   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef,omitempty"`
+   SqlInfo *VmRestorePointSqlInfoType `xml:"SqlInfo,omitempty"`
    VmDisplayName string `xml:"VmDisplayName,attr"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1416,13 +1416,13 @@ type VAppRestorePointEntityType struct {
    VAppName string `xml:"VAppName"`
    Algorithm string `xml:"Algorithm"`
    PointType string `xml:"PointType"`
-   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef"`
+   HierarchyObjRef HierarchyObjRefType `xml:"HierarchyObjRef,omitempty"`
    VAppDisplayName string `xml:"VAppDisplayName,attr"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1463,7 +1463,7 @@ type VmReplicaPointEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1487,7 +1487,7 @@ type VmRestorePointMountType struct {
    XMLName xml.Name
    FSRoots *DirectoryEntryListType `xml:"FSRoots"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1511,7 +1511,7 @@ type VmReplicaPointMountType struct {
    XMLName xml.Name
    FSRoots *DirectoryEntryListType `xml:"FSRoots"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1538,7 +1538,7 @@ type CatalogVmEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1565,7 +1565,7 @@ type CatalogVmRestorePointEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1590,7 +1590,7 @@ type FileSystemEntryType struct {
    FileEntry *FileEntryType `xml:"FileEntry,omitempty"`
    DirectoryEntry *DirectoryEntryType `xml:"DirectoryEntry,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1605,7 +1605,7 @@ type DirectoryEntryType struct {
    Path string `xml:"Path"`
    Name string `xml:"Name"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1624,7 +1624,7 @@ type FileEntryType struct {
    ModifiedDateUTC DateTime `xml:"ModifiedDateUTC"`
    Actions *LinkListType `xml:"Actions"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1636,7 +1636,7 @@ func (l FileEntryType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type FileEntryListType struct { 
    XMLName xml.Name
-   FileEntry *FileEntryType `xml:"FileEntry"`
+   FileEntry []*FileEntryType `xml:"FileEntry"`
    //Inhereting from ListType
 }
 
@@ -1646,14 +1646,14 @@ type FileEntryListType struct {
  */
 type HierarchyRootEntityType struct { 
    XMLName xml.Name
-   HierarchyRootId string `xml:"HierarchyRootId"`
-   UniqueId string `xml:"UniqueId"`
-   HostType string `xml:"HostType"`
+   HierarchyRootId string `xml:"HierarchyRootId,omitempty"`
+   UniqueId string `xml:"UniqueId,omitempty"`
+   HostType string `xml:"HostType,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1671,7 +1671,7 @@ type RepositoryEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1683,7 +1683,7 @@ func (l RepositoryEntityType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type HierarchyRootEntityListType struct { 
    XMLName xml.Name
-   HierarchyRoot *HierarchyRootEntityType `xml:"HierarchyRoot"`
+   HierarchyRoot []*HierarchyRootEntityType `xml:"HierarchyRoot"`
    //Inhereting from ListType
 }
 
@@ -1693,7 +1693,7 @@ type HierarchyRootEntityListType struct {
  */
 type RepositoryEntityListType struct { 
    XMLName xml.Name
-   Repository *RepositoryEntityType `xml:"Repository"`
+   Repository []*RepositoryEntityType `xml:"Repository"`
    //Inhereting from ListType
 }
 
@@ -1703,7 +1703,7 @@ type RepositoryEntityListType struct {
  */
 type DirectoryEntryListType struct { 
    XMLName xml.Name
-   DirectoryEntry *DirectoryEntryType `xml:"DirectoryEntry"`
+   DirectoryEntry []*DirectoryEntryType `xml:"DirectoryEntry"`
    //Inhereting from ListType
 }
 
@@ -1713,11 +1713,11 @@ type DirectoryEntryListType struct {
  */
 type FileSystemEntriesType struct { 
    XMLName xml.Name
-   Files *FileEntryListType `xml:"Files"`
-   Directories *DirectoryEntryListType `xml:"Directories"`
-   PagingInfo *PagingInfoType `xml:"PagingInfo"`
+   Files *FileEntryListType `xml:"Files,omitempty"`
+   Directories *DirectoryEntryListType `xml:"Directories,omitempty"`
+   PagingInfo *PagingInfoType `xml:"PagingInfo,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1823,8 +1823,8 @@ func NewRestoreSpecType() (*RestoreSpecType) {
  */
 type VmRestoreSpecInfoType struct { 
    XMLName xml.Name
-   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore"`
-   QuickRollback bool `xml:"QuickRollback"`
+   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore,omitempty"`
+   QuickRollback bool `xml:"QuickRollback,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1834,10 +1834,10 @@ type VmRestoreSpecInfoType struct {
  */
 type vCloudVmRestoreSpecInfoType struct { 
    XMLName xml.Name
-   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore"`
-   HierarchyRootUid UidType `xml:"HierarchyRootUid"`
-   vAppRef HierarchyObjRefType `xml:"vAppRef"`
-   VmRestoreParameters *vCloudVmRestoreParametersInfoType `xml:"VmRestoreParameters"`
+   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore,omitempty"`
+   HierarchyRootUid UidType `xml:"HierarchyRootUid,omitempty"`
+   vAppRef HierarchyObjRefType `xml:"vAppRef,omitempty"`
+   VmRestoreParameters *vCloudVmRestoreParametersInfoType `xml:"VmRestoreParameters,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1847,10 +1847,10 @@ type vCloudVmRestoreSpecInfoType struct {
  */
 type vCloudVAppRestoreSpecInfoType struct { 
    XMLName xml.Name
-   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore"`
-   HierarchyRootUid UidType `xml:"HierarchyRootUid"`
-   OrgVdcRef HierarchyObjRefType `xml:"OrgVdcRef"`
-   vAppNewName string `xml:"vAppNewName"`
+   PowerOnAfterRestore bool `xml:"PowerOnAfterRestore,omitempty"`
+   HierarchyRootUid UidType `xml:"HierarchyRootUid,omitempty"`
+   OrgVdcRef HierarchyObjRefType `xml:"OrgVdcRef,omitempty"`
+   vAppNewName string `xml:"vAppNewName,omitempty"`
    VmsRestoreParameters *vCloudVAppRestoreSpecInfoTypeNestedVmsRestoreParameters `xml:"VmsRestoreParameters"`
    //Inhereting from InfoType
 }
@@ -1861,7 +1861,7 @@ type vCloudVAppRestoreSpecInfoType struct {
  */
 type vCloudVAppRestoreSpecInfoTypeNestedVmsRestoreParameters struct { 
    XMLName xml.Name
-   Vm *vCloudVmRestoreParametersInfoType `xml:"Vm"`
+   Vm []*vCloudVmRestoreParametersInfoType `xml:"Vm"`
 }
 
 /*
@@ -1870,11 +1870,11 @@ type vCloudVAppRestoreSpecInfoTypeNestedVmsRestoreParameters struct {
  */
 type vCloudVmRestoreParametersInfoType struct { 
    XMLName xml.Name
-   VmRestorePointUid UidType `xml:"VmRestorePointUid"`
-   VmNewName string `xml:"VmNewName"`
-   DatastoreRef HierarchyObjRefType `xml:"DatastoreRef"`
-   OrgVdcStorageProfileRef HierarchyObjRefType `xml:"OrgVdcStorageProfileRef"`
-   LinkedCloneVmTemplateRef HierarchyObjRefType `xml:"LinkedCloneVmTemplateRef"`
+   VmRestorePointUid UidType `xml:"VmRestorePointUid,omitempty"`
+   VmNewName string `xml:"VmNewName,omitempty"`
+   DatastoreRef HierarchyObjRefType `xml:"DatastoreRef,omitempty"`
+   OrgVdcStorageProfileRef HierarchyObjRefType `xml:"OrgVdcStorageProfileRef,omitempty"`
+   LinkedCloneVmTemplateRef HierarchyObjRefType `xml:"LinkedCloneVmTemplateRef,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1884,9 +1884,9 @@ type vCloudVmRestoreParametersInfoType struct {
  */
 type BackupJobCloneInfoType struct { 
    XMLName xml.Name
-   JobName string `xml:"JobName"`
-   FolderName string `xml:"FolderName"`
-   RepositoryUid UidType `xml:"RepositoryUid"`
+   JobName string `xml:"JobName,omitempty"`
+   FolderName string `xml:"FolderName,omitempty"`
+   RepositoryUid UidType `xml:"RepositoryUid,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1896,8 +1896,8 @@ type BackupJobCloneInfoType struct {
  */
 type ReplicaJobCloneInfoType struct { 
    XMLName xml.Name
-   JobName string `xml:"JobName"`
-   VmSuffix string `xml:"VmSuffix"`
+   JobName string `xml:"JobName,omitempty"`
+   VmSuffix string `xml:"VmSuffix,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -1938,8 +1938,8 @@ type TaskResultInfoType struct {
  */
 type ErrorType struct { 
    XMLName xml.Name
-   FirstChanceExceptionMessage string `xml:"FirstChanceExceptionMessage"`
-   StackTrace string `xml:"StackTrace"`
+   FirstChanceExceptionMessage string `xml:"FirstChanceExceptionMessage,omitempty"`
+   StackTrace string `xml:"StackTrace,omitempty"`
    Message string `xml:"Message,attr"`
    StatusCode int `xml:"StatusCode,attr"`
    Status string `xml:"Status,attr"`
@@ -1952,11 +1952,11 @@ type ErrorType struct {
  */
 type HierarchyItemType struct { 
    XMLName xml.Name
-   ObjectRef HierarchyObjRefType `xml:"ObjectRef"`
-   ObjectType string `xml:"ObjectType"`
-   ObjectName string `xml:"ObjectName"`
+   ObjectRef HierarchyObjRefType `xml:"ObjectRef,omitempty"`
+   ObjectType string `xml:"ObjectType,omitempty"`
+   ObjectName string `xml:"ObjectName,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1969,7 +1969,7 @@ func (l HierarchyItemType) GetLinks() (*LinkListType) { return (l.Links) }
 type QuerySvcType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1982,7 +1982,7 @@ func (l QuerySvcType) GetLinks() (*LinkListType) { return (l.Links) }
 type LookupSvcType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -1995,7 +1995,7 @@ func (l LookupSvcType) GetLinks() (*LinkListType) { return (l.Links) }
 type ReportingSvcType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2011,7 +2011,7 @@ type EnterpriseRoleEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2040,7 +2040,7 @@ type EnterpriseAccountEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2068,7 +2068,7 @@ type EnterpriseAccountHierarchyScopeType struct {
    HierarchyObjectType string `xml:"HierarchyObjectType"`
    State string `xml:"State"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2092,7 +2092,7 @@ type EnterpriseAccountInRoleType struct {
    XMLName xml.Name
    RoleName string `xml:"RoleName"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2170,7 +2170,7 @@ type EnterpriseAccountInRoleCreateSpecListType struct {
 type EnterpriseSecuritySettingsType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2182,12 +2182,12 @@ func (l EnterpriseSecuritySettingsType) GetLinks() (*LinkListType) { return (l.L
  */
 type EnterpriseAccountCreateSpecType struct { 
    XMLName xml.Name
-   AccountType AccountTypeEnumeration `xml:"AccountType"`
-   AccountName string `xml:"AccountName"`
-   Roles *EnterpriseAccountInRoleCreateSpecListType `xml:"Roles"`
-   AllowRestoreAllVms bool `xml:"AllowRestoreAllVms"`
-   HierarchyScopeObjects *HierarchyScopeCreateSpecType `xml:"HierarchyScopeObjects"`
-   FlrSettings *FileRestoreSettingsSpecsType `xml:"FlrSettings"`
+   AccountType AccountTypeEnumeration `xml:"AccountType,omitempty"`
+   AccountName string `xml:"AccountName,omitempty"`
+   Roles *EnterpriseAccountInRoleCreateSpecListType `xml:"Roles,omitempty"`
+   AllowRestoreAllVms bool `xml:"AllowRestoreAllVms,omitempty"`
+   HierarchyScopeObjects *HierarchyScopeCreateSpecType `xml:"HierarchyScopeObjects,omitempty"`
+   FlrSettings *FileRestoreSettingsSpecsType `xml:"FlrSettings,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -2204,7 +2204,7 @@ func NewEnterpriseAccountCreateSpecType() (*EnterpriseAccountCreateSpecType) {
  */
 type FileRestoreSettingsSpecsType struct { 
    XMLName xml.Name
-   FlrInlaceOnly bool `xml:"FlrInlaceOnly"`
+   FlrInlaceOnly bool `xml:"FlrInlaceOnly,omitempty"`
    FlrExtentionRestrictions string `xml:"FlrExtentionRestrictions"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
@@ -2276,7 +2276,7 @@ type WanAcceleratorEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2298,18 +2298,18 @@ type WanAcceleratorEntityListType struct {
  */
 type CloudGatewayEntityType struct { 
    XMLName xml.Name
-   Enabled bool `xml:"Enabled"`
+   Enabled bool `xml:"Enabled,omitempty"`
    DnsNameOrIpAddress string `xml:"DnsNameOrIpAddress"`
-   NetworkMode CloudGatewayNetworkingMode `xml:"NetworkMode"`
+   NetworkMode CloudGatewayNetworkingMode `xml:"NetworkMode,omitempty"`
    ExternalIP string `xml:"ExternalIP"`
-   ExternalPort uint16 `xml:"ExternalPort"`
-   InternalPort uint16 `xml:"InternalPort"`
+   ExternalPort uint16 `xml:"ExternalPort,omitempty"`
+   InternalPort uint16 `xml:"InternalPort,omitempty"`
    Description string `xml:"Description"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2343,24 +2343,24 @@ type CloudTenantEntityType struct {
    XMLName xml.Name
    Password string `xml:"Password"`
    Description string `xml:"Description"`
-   Enabled bool `xml:"Enabled"`
-   LeaseOptions *CloudTenantLeaseOptionsType `xml:"LeaseOptions"`
+   Enabled bool `xml:"Enabled,omitempty"`
+   LeaseOptions *CloudTenantLeaseOptionsType `xml:"LeaseOptions,omitempty"`
    Resources *CloudTenantResourceListType `xml:"Resources"`
    LastResult string `xml:"LastResult"`
-   LastActive DateTime `xml:"LastActive"`
-   VmCount int `xml:"VmCount"`
-   ComputeResources *CloudTenantComputeResourceListType `xml:"ComputeResources"`
-   ThrottlingEnabled bool `xml:"ThrottlingEnabled"`
-   ThrottlingSpeedLimit int `xml:"ThrottlingSpeedLimit"`
-   ThrottlingSpeedUnit string `xml:"ThrottlingSpeedUnit"`
-   PublicIpCount int `xml:"PublicIpCount"`
-   BackupCount int `xml:"BackupCount"`
-   ReplicaCount int `xml:"ReplicaCount"`
+   LastActive DateTime `xml:"LastActive,omitempty"`
+   VmCount int `xml:"VmCount,omitempty"`
+   ComputeResources *CloudTenantComputeResourceListType `xml:"ComputeResources,omitempty"`
+   ThrottlingEnabled bool `xml:"ThrottlingEnabled,omitempty"`
+   ThrottlingSpeedLimit int `xml:"ThrottlingSpeedLimit,omitempty"`
+   ThrottlingSpeedUnit string `xml:"ThrottlingSpeedUnit,omitempty"`
+   PublicIpCount int `xml:"PublicIpCount,omitempty"`
+   BackupCount int `xml:"BackupCount,omitempty"`
+   ReplicaCount int `xml:"ReplicaCount,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2386,7 +2386,7 @@ type CloudTenantResourceType struct {
    RepositoryQuota *CloudTenantRepositoryQuotaInfoType `xml:"RepositoryQuota,omitempty"`
    Id string `xml:"Id,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2410,9 +2410,9 @@ type CloudTenantRepositoryQuotaInfoType struct {
    XMLName xml.Name
    DisplayName string `xml:"DisplayName"`
    RepositoryUid UidType `xml:"RepositoryUid"`
-   WanAcceleratorUid UidType `xml:"WanAcceleratorUid"`
-   Quota int64 `xml:"Quota"`
-   UsedQuota int64 `xml:"UsedQuota"`
+   WanAcceleratorUid UidType `xml:"WanAcceleratorUid,omitempty"`
+   Quota int64 `xml:"Quota,omitempty"`
+   UsedQuota int64 `xml:"UsedQuota,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -2425,11 +2425,11 @@ type CreateCloudGatewaySpecType struct {
    BackupServerIdOrName string `xml:"BackupServerIdOrName"`
    ServerHostName string `xml:"ServerHostName"`
    Description string `xml:"Description"`
-   IncomingPort uint16 `xml:"IncomingPort"`
+   IncomingPort uint16 `xml:"IncomingPort,omitempty"`
    ExternalIp string `xml:"ExternalIp"`
    ExternalPort uint16 `xml:"ExternalPort"`
-   NetworkType CloudGatewayNetworkingMode `xml:"NetworkType"`
-   InternalPort uint16 `xml:"InternalPort"`
+   NetworkType CloudGatewayNetworkingMode `xml:"NetworkType,omitempty"`
+   InternalPort uint16 `xml:"InternalPort,omitempty"`
    BackupServerUid UidType `xml:"BackupServerUid"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
@@ -2452,14 +2452,14 @@ type CreateCloudTenantSpecType struct {
    Description string `xml:"Description"`
    Password string `xml:"Password"`
    Enabled bool `xml:"Enabled"`
-   LeaseExpirationDate DateTime `xml:"LeaseExpirationDate"`
+   LeaseExpirationDate DateTime `xml:"LeaseExpirationDate,omitempty"`
    Resources *CreateCloudTenantResourceListType `xml:"Resources"`
    ComputeResources *CloudTenantComputeResourceCreateListType `xml:"ComputeResources"`
-   VmCount int `xml:"VmCount"`
-   ThrottlingEnabled bool `xml:"ThrottlingEnabled"`
-   ThrottlingSpeedLimit int `xml:"ThrottlingSpeedLimit"`
-   ThrottlingSpeedUnit string `xml:"ThrottlingSpeedUnit"`
-   PublicIpCount int `xml:"PublicIpCount"`
+   VmCount int `xml:"VmCount,omitempty"`
+   ThrottlingEnabled bool `xml:"ThrottlingEnabled,omitempty"`
+   ThrottlingSpeedLimit int `xml:"ThrottlingSpeedLimit,omitempty"`
+   ThrottlingSpeedUnit string `xml:"ThrottlingSpeedUnit,omitempty"`
+   PublicIpCount int `xml:"PublicIpCount,omitempty"`
    BackupServerUid UidType `xml:"BackupServerUid"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
@@ -2490,7 +2490,7 @@ type CreateCloudTenantResourceSpecType struct {
    Name string `xml:"Name"`
    RepositoryUid UidType `xml:"RepositoryUid"`
    QuotaMb int `xml:"QuotaMb"`
-   WanAcceleratorUid UidType `xml:"WanAcceleratorUid"`
+   WanAcceleratorUid UidType `xml:"WanAcceleratorUid,omitempty"`
    Folder string `xml:"Folder"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
@@ -2518,15 +2518,15 @@ type CloudHardwarePlanEntityListType struct {
  */
 type CloudHardwarePlanEntityType struct { 
    XMLName xml.Name
-   Description string `xml:"Description"`
-   ProcessorUsageLimitMhz int `xml:"ProcessorUsageLimitMhz"`
-   MemoryUsageLimitMb int `xml:"MemoryUsageLimitMb"`
-   HardwarePlanDetails *CloudHardwarePlanEntityTypeNestedHardwarePlanDetails `xml:"HardwarePlanDetails"`
+   Description string `xml:"Description,omitempty"`
+   ProcessorUsageLimitMhz int `xml:"ProcessorUsageLimitMhz,omitempty"`
+   MemoryUsageLimitMb int `xml:"MemoryUsageLimitMb,omitempty"`
+   HardwarePlanDetails *CloudHardwarePlanEntityTypeNestedHardwarePlanDetails `xml:"HardwarePlanDetails,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2553,7 +2553,7 @@ type CloudHardwarePlanCreateSpecType struct {
    Description string `xml:"Description"`
    ProcessorUsageLimitMhz int `xml:"ProcessorUsageLimitMhz"`
    MemoryUsageLimitMb int `xml:"MemoryUsageLimitMb"`
-   HardwarePlanDetails *CloudHardwarePlanCreateSpecTypeNestedHardwarePlanDetails `xml:"HardwarePlanDetails"`
+   HardwarePlanDetails *CloudHardwarePlanCreateSpecTypeNestedHardwarePlanDetails `xml:"HardwarePlanDetails,omitempty"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -2674,7 +2674,7 @@ type CloudFailoverSessionEntityType struct {
    JobName string `xml:"JobName"`
    JobType string `xml:"JobType"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -2683,7 +2683,7 @@ type CloudFailoverSessionEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2707,7 +2707,7 @@ type CloudFailoverTaskSessionInfoType struct {
    XMLName xml.Name
    VmReplicaPointLink *LinkType `xml:"VmReplicaPointLink"`
    CreationTimeUTC DateTime `xml:"CreationTimeUTC"`
-   EndTimeUTC DateTime `xml:"EndTimeUTC"`
+   EndTimeUTC DateTime `xml:"EndTimeUTC,omitempty"`
    State string `xml:"State"`
    Result string `xml:"Result"`
    Progress int `xml:"Progress"`
@@ -2749,7 +2749,7 @@ type CloudPublicIpAddressEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2791,14 +2791,14 @@ type CloudTenantComputeResourceListType struct {
 type CloudTenantComputeResourceType struct { 
    XMLName xml.Name
    CloudHardwarePlanUid UidType `xml:"CloudHardwarePlanUid"`
-   WanAcceleratorUid UidType `xml:"WanAcceleratorUid"`
+   WanAcceleratorUid UidType `xml:"WanAcceleratorUid,omitempty"`
    PlatformType string `xml:"PlatformType"`
    UseNetworkFailoverResources bool `xml:"UseNetworkFailoverResources"`
    NetworkAppliance *NetworkApplianceInfoType `xml:"NetworkAppliance"`
    ComputeResourceStats *ComputeResourceStatsInfoType `xml:"ComputeResourceStats"`
    Id string `xml:"Id,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2866,7 +2866,7 @@ type CloudTenantComputeResourceCreateListType struct {
 type CloudTenantComputeResourceCreateSpecType struct { 
    XMLName xml.Name
    CloudHardwarePlanUid UidType `xml:"CloudHardwarePlanUid"`
-   WanAcceleratorUid UidType `xml:"WanAcceleratorUid"`
+   WanAcceleratorUid UidType `xml:"WanAcceleratorUid,omitempty"`
    PlatformType string `xml:"PlatformType"`
    UseNetworkFailoverResources bool `xml:"UseNetworkFailoverResources"`
    //Inhereting from SpecType
@@ -2894,7 +2894,7 @@ type CloudVmReplicaPointEntityType struct {
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2928,14 +2928,14 @@ type CloudFailoverPlanEntityType struct {
    XMLName xml.Name
    TenantUid UidType `xml:"TenantUid"`
    TenantName string `xml:"TenantName"`
-   Description string `xml:"Description"`
+   Description string `xml:"Description,omitempty"`
    CloudFailoverPlanOptions *CloudFailoverPlanOptionsInfoType `xml:"CloudFailoverPlanOptions"`
    CloudFailoverPlanInfo *CloudFailoverPlanInfoType `xml:"CloudFailoverPlanInfo"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -2965,7 +2965,7 @@ func NewCloudFailoverPlanManagementSpecType() (*CloudFailoverPlanManagementSpecT
  */
 type CloudFailoverPlanInfoType struct { 
    XMLName xml.Name
-   Includes *CloudFailoveredVmListType `xml:"Includes"`
+   Includes *CloudFailoveredVmListType `xml:"Includes,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -2975,11 +2975,11 @@ type CloudFailoverPlanInfoType struct {
  */
 type CloudFailoveredVmType struct { 
    XMLName xml.Name
-   FailoverPlanVMId string `xml:"FailoverPlanVMId"`
-   Name string `xml:"Name"`
-   Order int `xml:"Order"`
+   FailoverPlanVMId string `xml:"FailoverPlanVMId,omitempty"`
+   Name string `xml:"Name,omitempty"`
+   Order int `xml:"Order,omitempty"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -3015,12 +3015,12 @@ type CloudFailoverPlanOptionsInfoType struct {
 type CloudReplicaEntityType struct { 
    XMLName xml.Name
    Ref *EntityReferenceType `xml:"Ref"`
-   Platform string `xml:"Platform"`
+   Platform string `xml:"Platform,omitempty"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -3043,7 +3043,7 @@ type CloudReplicaEntityListType struct {
 type CloudConnectServiceType struct { 
    XMLName xml.Name
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -3084,13 +3084,13 @@ type VlanConfigurationEntityType struct {
    VlanIdsWithoutInternetRightBound int `xml:"VlanIdsWithoutInternetRightBound"`
    SwitchName string `xml:"SwitchName"`
    SwitchId string `xml:"SwitchId"`
-   ClusterName string `xml:"ClusterName"`
+   ClusterName string `xml:"ClusterName,omitempty"`
    ClusterId string `xml:"ClusterId"`
    //Inhereting from EntityType
    Name string `xml:"Name,attr"`
    UID UidType `xml:"UID,attr"`
    //Inhereting from ResourceType
-   Links *LinkListType `xml:"Links"`
+   Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
    Type string `xml:"Type,attr"`
 }
@@ -3133,7 +3133,7 @@ type NetworkApplianceInfoType struct {
    Name string `xml:"Name"`
    ProductionNetwork string `xml:"ProductionNetwork"`
    ObtainIPAddressAutomatically bool `xml:"ObtainIPAddressAutomatically"`
-   ManualIpAddressSettingsInfoType *ManualIpAddressSettingsInfoType `xml:"ManualIpAddressSettingsInfoType"`
+   ManualIpAddressSettingsInfoType *ManualIpAddressSettingsInfoType `xml:"ManualIpAddressSettingsInfoType,omitempty"`
    //Inhereting from InfoType
 }
 
@@ -3245,9 +3245,9 @@ type SqlItemRestoreSpecInfoType struct {
  */
 type SqlCredentialsInfoType struct { 
    XMLName xml.Name
-   SqlCredentials *PlainCredentialsType `xml:"SqlCredentials"`
-   ServerCredentials *PlainCredentialsType `xml:"ServerCredentials"`
-   UserCredentials *PlainCredentialsType `xml:"UserCredentials"`
+   SqlCredentials *PlainCredentialsType `xml:"SqlCredentials,omitempty"`
+   ServerCredentials *PlainCredentialsType `xml:"ServerCredentials,omitempty"`
+   UserCredentials *PlainCredentialsType `xml:"UserCredentials,omitempty"`
    UseSqlAuth bool `xml:"UseSqlAuth"`
    //Inhereting from InfoType
 }

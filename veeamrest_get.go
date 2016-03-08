@@ -1087,9 +1087,6 @@ func (v * VeeamRestServer) GetReplicaTaskSessions() (ReplicaTaskSessionEntityLis
 }
 
 
-
-
-
 /*
  * LoginSpec 
  * Not validated 
@@ -1251,142 +1248,6 @@ func (v * VeeamRestServer) GetTasks() (TaskListType,error) {
 }
 
 
-/*
- * SummaryReport 
- * Not validated 
- */
-func (v * VeeamRestServer) GetSummaryReport(idstring string) (SummaryReportType,error) { 
-  var returnerr error 
-  SummaryReport := SummaryReportType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","SummaryReport",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&SummaryReport)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error SummaryReport",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking SummaryReport",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return SummaryReport,returnerr
-}
-
-
-/*
- * OverviewReportFrame 
- * Not validated 
- */
-func (v * VeeamRestServer) GetOverviewReportFrame(idstring string) (OverviewReportFrameType,error) { 
-  var returnerr error 
-  OverviewReportFrame := OverviewReportFrameType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","OverviewReportFrame",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&OverviewReportFrame)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error OverviewReportFrame",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking OverviewReportFrame",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return OverviewReportFrame,returnerr
-}
-
-
-/*
- * VmsOverviewReportFrame 
- * Not validated 
- */
-func (v * VeeamRestServer) GetVmsOverviewReportFrame(idstring string) (VmsOverviewReportFrameType,error) { 
-  var returnerr error 
-  VmsOverviewReportFrame := VmsOverviewReportFrameType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","VmsOverviewReportFrame",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&VmsOverviewReportFrame)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error VmsOverviewReportFrame",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking VmsOverviewReportFrame",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return VmsOverviewReportFrame,returnerr
-}
-
-
-/*
- * JobStatisticsReportFrame 
- * Not validated 
- */
-func (v * VeeamRestServer) GetJobStatisticsReportFrame(idstring string) (JobStatisticsReportFrameType,error) { 
-  var returnerr error 
-  JobStatisticsReportFrame := JobStatisticsReportFrameType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","JobStatisticsReportFrame",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&JobStatisticsReportFrame)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error JobStatisticsReportFrame",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking JobStatisticsReportFrame",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return JobStatisticsReportFrame,returnerr
-}
-
-
-/*
- * RepositoryReportFrame 
- * Not validated 
- */
-func (v * VeeamRestServer) GetRepositoryReportFrame(idstring string) (RepositoryReportFrameType,error) { 
-  var returnerr error 
-  RepositoryReportFrame := RepositoryReportFrameType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","RepositoryReportFrame",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&RepositoryReportFrame)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error RepositoryReportFrame",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking RepositoryReportFrame",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return RepositoryReportFrame,returnerr
-}
-
-
-/*
- * ProcessedVmsReportFrame 
- * Not validated 
- */
-func (v * VeeamRestServer) GetProcessedVmsReportFrame(idstring string) (ProcessedVmsReportFrameType,error) { 
-  var returnerr error 
-  ProcessedVmsReportFrame := ProcessedVmsReportFrameType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","ProcessedVmsReportFrame",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&ProcessedVmsReportFrame)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error ProcessedVmsReportFrame",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking ProcessedVmsReportFrame",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return ProcessedVmsReportFrame,returnerr
-}
 
 
 /*
@@ -1456,12 +1317,6 @@ func (v * VeeamRestServer) GetHierarchyItems() (HierarchyItemListType,error) {
   } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
   return HierarchyItems,returnerr
 }
-
-
-
-
-
-
 
 
 /*

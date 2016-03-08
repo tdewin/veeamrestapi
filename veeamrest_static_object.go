@@ -131,11 +131,11 @@ func (v * VeeamRestServer) GetLookupSvc(idstring string) (LookupSvcType,error) {
  * ReportingSvc 
  * Not validated 
  */
-func (v * VeeamRestServer) GetReportingSvc(idstring string) (ReportingSvcType,error) { 
+func (v * VeeamRestServer) GetReportingSvc() (ReportingSvcType,error) { 
   var returnerr error 
   ReportingSvc := ReportingSvcType{} 
   if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","ReportingSvc",idstring)),"GET") 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s","reports/summary")),"GET") 
      xmlin, err := v.Request(vrr)
      if err == nil {	
      	err = xml.Unmarshal([]byte(xmlin),&ReportingSvc)
@@ -148,3 +148,4 @@ func (v * VeeamRestServer) GetReportingSvc(idstring string) (ReportingSvcType,er
   } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
   return ReportingSvc,returnerr
 }
+
