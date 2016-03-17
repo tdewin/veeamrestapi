@@ -857,96 +857,6 @@ func (v * VeeamRestServer) GetRepositories() (RepositoryEntityListType,error) {
 }
 
 
-/*
- * BackupJobSession 
- * Not validated 
- */
-func (v * VeeamRestServer) GetBackupJobSession(idstring string) (BackupJobSessionEntityType,error) { 
-  var returnerr error 
-  BackupJobSession := BackupJobSessionEntityType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","BackupJobSessions",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&BackupJobSession)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error BackupJobSession",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking BackupJobSession",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return BackupJobSession,returnerr
-}
-
-
-/*
- * BackupJobSessions 
- * Not validated 
- */
-func (v * VeeamRestServer) GetBackupJobSessions() (BackupJobSessionEntityListType,error) { 
-  var returnerr error 
-  BackupJobSessions := BackupJobSessionEntityListType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s?format=Entity","BackupJobSessions")),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&BackupJobSessions)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error BackupJobSessions",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking BackupJobSessions",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return BackupJobSessions,returnerr
-}
-
-
-/*
- * ReplicaJobSession 
- * Not validated 
- */
-func (v * VeeamRestServer) GetReplicaJobSession(idstring string) (ReplicaJobSessionEntityType,error) { 
-  var returnerr error 
-  ReplicaJobSession := ReplicaJobSessionEntityType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s?format=Entity","ReplicaJobSessions",idstring)),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&ReplicaJobSession)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error ReplicaJobSession",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking ReplicaJobSession",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return ReplicaJobSession,returnerr
-}
-
-
-/*
- * ReplicaJobSessions 
- * Not validated 
- */
-func (v * VeeamRestServer) GetReplicaJobSessions() (ReplicaJobSessionEntityListType,error) { 
-  var returnerr error 
-  ReplicaJobSessions := ReplicaJobSessionEntityListType{} 
-  if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s?format=Entity","ReplicaJobSessions")),"GET") 
-     xmlin, err := v.Request(vrr)
-     if err == nil {	
-     	err = xml.Unmarshal([]byte(xmlin),&ReplicaJobSessions)
-     	if err != nil {
-     	    returnerr = &VeeamRestError{"Unmarshal error ReplicaJobSessions",err.Error()}
-     	}
-     } else {	
-        returnerr = &VeeamRestError{"Invalid request asking ReplicaJobSessions",err.Error()}
-     }
-  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
-  return ReplicaJobSessions,returnerr
-}
 
 
 /*
@@ -1246,8 +1156,6 @@ func (v * VeeamRestServer) GetTasks() (TaskListType,error) {
   } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
   return Tasks,returnerr
 }
-
-
 
 
 /*

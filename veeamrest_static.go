@@ -137,7 +137,7 @@ func (v * VeeamRestServer) Request(vrr * VeeamRestRequest) (string,error) {
 		}
 		v.Logger.LogRequest(fmt.Sprintf("Contacting (%s) %s",vrr.Method, vrr.Url))
 		if vrr.Post != "" {
-			v.Logger.LogRequest("Posting "+vrr.Post)
+			v.Logger.LogRequest("Posting\n"+vrr.Post)
 		}
 		resp, err := v.Client.Do(req)
 		if err == nil {
@@ -174,6 +174,19 @@ func (v * VeeamRestServer) Request(vrr * VeeamRestRequest) (string,error) {
 	return returnxml,returnerr
 }
 
+func (v * VeeamRestServer) GenericXMLRequest(url string,action string,post string) (string,error) {
+	vrr := v.MakeRequest(v.ConstructUrl(url),action)
+	vrr.Post = post
+	return v.Request(vrr)				
+}
+func (v * VeeamRestServer) GenericRequest(url string,o interface{},action string,post string) (error) {
+	xmlin,err := v.GenericXMLRequest(url,action,post)
+	if err == nil {	
+		err  = xml.Unmarshal([]byte(xmlin),o)
+	}
+	return err 
+}
+
 func (v * VeeamRestServer) GenericGetXMLRequest(url string) (string,error) {
 	vrr := v.MakeRequest(v.ConstructUrl(url),"GET")
 	return v.Request(vrr)				
@@ -186,11 +199,25 @@ func (v * VeeamRestServer) GenericGetRequest(url string,o interface{}) (error) {
 	return err 
 }
 
+func (v * VeeamRestServer) GenericDeleteXMLRequest(url string) (string,error) {
+	vrr := v.MakeRequest(v.ConstructUrl(url),"DELETE")
+	return v.Request(vrr)				
+}
+func (v * VeeamRestServer) GenericDeleteRequest(url string,o interface{}) (error) {
+	xmlin,err := v.GenericDeleteXMLRequest(url)
+	if err == nil {	
+		err  = xml.Unmarshal([]byte(xmlin),o)
+	}
+	return err 
+}
+
 func (v * VeeamRestServer) GenericPostXMLRequest(url string,post string) (string,error) {
 	vrr := v.MakeRequest(v.ConstructUrl(url),"POST")
 	vrr.Post = post
 	return v.Request(vrr)				
 }
+
+
 func (v * VeeamRestServer) GenericPostRequest(url string,post string,o interface{}) (error) {
 	xmlin,err := v.GenericPostXMLRequest(url,post)
 	if err == nil {	
@@ -198,6 +225,23 @@ func (v * VeeamRestServer) GenericPostRequest(url string,post string,o interface
 	}
 	return err 
 }
+
+
+func (v * VeeamRestServer) GenericPutXMLRequest(url string,post string) (string,error) {
+	vrr := v.MakeRequest(v.ConstructUrl(url),"PUT")
+	vrr.Post = post
+	return v.Request(vrr)				
+}
+
+
+func (v * VeeamRestServer) GenericPutRequest(url string,post string,o interface{}) (error) {
+	xmlin,err := v.GenericPutXMLRequest(url,post)
+	if err == nil {	
+		err  = xml.Unmarshal([]byte(xmlin),o)
+	}
+	return err 
+}
+
 func MarshalForPost(v interface{}) (string) {
 	marshal,_ := xml.MarshalIndent(v,"","  ")
 	return xml.Header +string(marshal)

@@ -59,7 +59,7 @@ func (v * VeeamRestServer) GetVmsOverviewReportFrame() (VmsOverviewReportFrameTy
   var returnerr error 
   VmsOverviewReportFrame := VmsOverviewReportFrameType{} 
   if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","VmsOverview")),"GET") 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","Vms_Overview")),"GET") 
      xmlin, err := v.Request(vrr)
      if err == nil {	
      	err = xml.Unmarshal([]byte(xmlin),&VmsOverviewReportFrame)
@@ -82,7 +82,7 @@ func (v * VeeamRestServer) GetJobStatisticsReportFrame() (JobStatisticsReportFra
   var returnerr error 
   JobStatisticsReportFrame := JobStatisticsReportFrameType{} 
   if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","JobStatistics")),"GET") 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","Job_Statistics")),"GET") 
      xmlin, err := v.Request(vrr)
      if err == nil {	
      	err = xml.Unmarshal([]byte(xmlin),&JobStatisticsReportFrame)
@@ -128,7 +128,7 @@ func (v * VeeamRestServer) GetProcessedVmsReportFrame() (ProcessedVmsReportFrame
   var returnerr error 
   ProcessedVmsReportFrame := ProcessedVmsReportFrameType{} 
   if (v.SessionId != "") { 
-     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","ProcessedVms")),"GET") 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("reports/summary/%s","Processed_Vms")),"GET") 
      xmlin, err := v.Request(vrr)
      if err == nil {	
      	err = xml.Unmarshal([]byte(xmlin),&ProcessedVmsReportFrame)

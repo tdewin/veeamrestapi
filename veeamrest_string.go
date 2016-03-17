@@ -3123,9 +3123,12 @@ func (o HierarchyItemListType) FullString(full bool,depth int) (string) {
   var buffer bytes.Buffer
   var identbuffer bytes.Buffer
   identbuffer.WriteString("\r\n");for i:=0;i <depth;i++ { identbuffer.WriteRune(' ') }
-  if full && o.HierarchyItem != nil {
-   buffer.Write(identbuffer.Bytes())
-   buffer.WriteString("HierarchyItem                  : ");buffer.WriteString(o.HierarchyItem.FullString(full,depth+1))
+  if full {
+   for i,c := range o.HierarchyItem {
+    buffer.Write(identbuffer.Bytes())
+    buffer.WriteString(fmt.Sprintf("HierarchyItem[%d]",i))
+    buffer.WriteString(c.FullString(full,depth+1))
+   }
   }
    //Inhereting from ListType
   return buffer.String()

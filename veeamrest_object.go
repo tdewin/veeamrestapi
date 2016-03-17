@@ -1587,8 +1587,8 @@ type CatalogVmRestorePointEntityListType struct {
  */
 type FileSystemEntryType struct { 
    XMLName xml.Name
-   FileEntry *FileEntryType `xml:"FileEntry,omitempty"`
-   DirectoryEntry *DirectoryEntryType `xml:"DirectoryEntry,omitempty"`
+   FileEntry *FileEntryType `xml:"FileEntry"`
+   DirectoryEntry *DirectoryEntryType `xml:"DirectoryEntry"`
    //Inhereting from ResourceType
    Links *LinkListType `xml:"Links,omitempty"`
    Href UrlType `xml:"Href,attr"`
@@ -1729,7 +1729,7 @@ func (l FileSystemEntriesType) GetLinks() (*LinkListType) { return (l.Links) }
  */
 type HierarchyItemListType struct { 
    XMLName xml.Name
-   HierarchyItem *HierarchyItemType `xml:"HierarchyItem"`
+   HierarchyItem []*HierarchyItemType `xml:"HierarchyItem"`
    //Inhereting from ListType
 }
 
@@ -1769,8 +1769,8 @@ type RestoreSessionEntityListType struct {
  */
 type FileRestoreSpecType struct { 
    XMLName xml.Name
-   ToOriginalLocation *FileRestoreSpecTypeNestedToOriginalLocation `xml:"ToOriginalLocation,omitempty"`
-   ForDirectDownload *FileRestoreSpecTypeNestedForDirectDownload `xml:"ForDirectDownload,omitempty"`
+   ToOriginalLocation *FileRestoreSpecTypeNestedToOriginalLocation `xml:"ToOriginalLocation"`
+   ForDirectDownload *FileRestoreSpecTypeNestedForDirectDownload `xml:"ForDirectDownload"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -1803,10 +1803,10 @@ type FileRestoreSpecTypeNestedForDirectDownload struct {
  */
 type RestoreSpecType struct { 
    XMLName xml.Name
-   VmRestoreSpec *VmRestoreSpecInfoType `xml:"VmRestoreSpec,omitempty"`
-   vCloudVmRestoreSpec *vCloudVmRestoreSpecInfoType `xml:"vCloudVmRestoreSpec,omitempty"`
-   vCloudVAppRestoreSpec *vCloudVAppRestoreSpecInfoType `xml:"vCloudVAppRestoreSpec,omitempty"`
-   SqlItemRestoreSpec *SqlItemRestoreSpecInfoType `xml:"SqlItemRestoreSpec,omitempty"`
+   VmRestoreSpec *VmRestoreSpecInfoType `xml:"VmRestoreSpec"`
+   vCloudVmRestoreSpec *vCloudVmRestoreSpecInfoType `xml:"vCloudVmRestoreSpec"`
+   vCloudVAppRestoreSpec *vCloudVAppRestoreSpecInfoType `xml:"vCloudVAppRestoreSpec"`
+   SqlItemRestoreSpec *SqlItemRestoreSpecInfoType `xml:"SqlItemRestoreSpec"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
@@ -2222,9 +2222,9 @@ func NewFileRestoreSettingsSpecsType() (*FileRestoreSettingsSpecsType) {
  */
 type RebuildScopeJobSpecType struct { 
    XMLName xml.Name
-   RebuildAll *RebuildScopeJobSpecTypeNestedRebuildAll `xml:"RebuildAll,omitempty"`
-   RebuildUnprocessed *RebuildScopeJobSpecTypeNestedRebuildUnprocessed `xml:"RebuildUnprocessed,omitempty"`
-   RebuildForCurrentUser *RebuildScopeJobSpecTypeNestedRebuildForCurrentUser `xml:"RebuildForCurrentUser,omitempty"`
+   RebuildAll *RebuildScopeJobSpecTypeNestedRebuildAll `xml:"RebuildAll"`
+   RebuildUnprocessed *RebuildScopeJobSpecTypeNestedRebuildUnprocessed `xml:"RebuildUnprocessed"`
+   RebuildForCurrentUser *RebuildScopeJobSpecTypeNestedRebuildForCurrentUser `xml:"RebuildForCurrentUser"`
    //Inhereting from SpecType
    //Inhereting from ParamsType
 }
