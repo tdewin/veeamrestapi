@@ -1639,7 +1639,7 @@ func (h *SelfService) setTemplates() (error) {
 				
 				{{ range $i,$e := .Mount.Directories.DirectoryEntry}}
 					<tr><td>Dir</td>	<td class="namew"><a href="/{{$customer}}/showmount/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}">{{$e.Name}}</a></td>		
-					<td class="iconwidth"><a href="/{{$customer}}/download/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}"><img src="/___staticfilesdownload.png"/></a></td>
+					<td class="iconwidth"><!--<a href="/{{$customer}}/download/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}"><img src="/___staticfilesdownload.png"/></a>--></td>
 					</tr>
 				{{end}}
 			{{end}}
