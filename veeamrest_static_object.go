@@ -269,3 +269,134 @@ func (v * VeeamRestServer) GetReplicaJobSessions() (ReplicaJobSessionEntityListT
   return ReplicaJobSessions,returnerr
 }
 
+
+/*
+ * VmRestorePointMount 
+ * Not validated 
+ */
+func (v * VeeamRestServer) GetVmRestorePointMount(idstring string,mountid string) (VmRestorePointMountType,error) { 
+  var returnerr error 
+  VmRestorePointMount := VmRestorePointMountType{} 
+  if (v.SessionId != "") { 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("/vmRestorePoints/%s/mounts/%s?format=Entity",idstring,mountid)),"GET") 
+     xmlin, err := v.Request(vrr)
+     if err == nil {	
+     	err = xml.Unmarshal([]byte(xmlin),&VmRestorePointMount)
+     	if err != nil {
+     	    returnerr = &VeeamRestError{"Unmarshal error VmRestorePointMount",err.Error()}
+     	}
+     } else {	
+        returnerr = &VeeamRestError{"Invalid request asking VmRestorePointMount",err.Error()}
+     }
+  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
+  return VmRestorePointMount,returnerr
+}
+
+/*
+ * VmReplicaPointMount 
+ * Not validated 
+ */
+func (v * VeeamRestServer) GetVmReplicaPointMount(idstring string,mountid string) (VmReplicaPointMountType,error) { 
+  var returnerr error 
+  VmReplicaPointMount := VmReplicaPointMountType{} 
+  if (v.SessionId != "") { 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("/vmReplicaPoints/%s/mounts/%s?format=Entity",idstring,mountid)),"GET") 
+     xmlin, err := v.Request(vrr)
+     if err == nil {	
+     	err = xml.Unmarshal([]byte(xmlin),&VmReplicaPointMount)
+     	if err != nil {
+     	    returnerr = &VeeamRestError{"Unmarshal error VmReplicaPointMount",err.Error()}
+     	}
+     } else {	
+        returnerr = &VeeamRestError{"Invalid request asking VmReplicaPointMount",err.Error()}
+     }
+  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
+  return VmReplicaPointMount,returnerr
+}
+
+
+/*
+ * VmRestorePointMounts 
+ * Not validated 
+ */
+func (v * VeeamRestServer) GetVmRestorePointMounts(restorepointid string) (VmRestorePointMountListType,error) { 
+  var returnerr error 
+  VmRestorePointMounts := VmRestorePointMountListType{} 
+  if (v.SessionId != "") { 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("VmRestorePoints/%s/mounts?format=Entity",restorepointid)),"GET") 
+     xmlin, err := v.Request(vrr)
+     if err == nil {	
+     	err = xml.Unmarshal([]byte(xmlin),&VmRestorePointMounts)
+     	if err != nil {
+     	    returnerr = &VeeamRestError{"Unmarshal error VmRestorePointMounts",err.Error()}
+     	}
+     } else {	
+        returnerr = &VeeamRestError{"Invalid request asking VmRestorePointMounts",err.Error()}
+     }
+  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
+  return VmRestorePointMounts,returnerr
+}
+
+
+
+/*
+ * VmReplicaPointMounts 
+ * Not validated 
+ */
+func (v * VeeamRestServer) GetVmReplicaPointMounts(restorepointid string) (VmReplicaPointMountListType,error) { 
+  var returnerr error 
+  VmReplicaPointMounts := VmReplicaPointMountListType{} 
+  if (v.SessionId != "") { 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("vmReplicaPoints/%s/mounts?format=Entity",restorepointid)),"GET") 
+     xmlin, err := v.Request(vrr)
+     if err == nil {	
+     	err = xml.Unmarshal([]byte(xmlin),&VmReplicaPointMounts)
+     	if err != nil {
+     	    returnerr = &VeeamRestError{"Unmarshal error VmReplicaPointMounts",err.Error()}
+     	}
+     } else {	
+        returnerr = &VeeamRestError{"Invalid request asking VmReplicaPointMounts",err.Error()}
+     }
+  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
+  return VmReplicaPointMounts,returnerr
+}
+
+
+
+
+type FsType string
+const (
+    FsBackup FsType = "vmRestorePoints"
+	FsReplica FsType = "vmReplicaPoints"
+)
+type FsListType string
+const (
+	ListAll FsListType = "listAll"
+	ListDirectories FsListType = "listDirs"
+	ListFiles FsListType = "listFiles"
+)
+/*
+ * FileSystemEntries 
+ * Not validated 
+ */
+func (v * VeeamRestServer) GetFileSystemEntries(fstype FsType,idstring string,mountid string,path string,fslisttype FsListType) (FileSystemEntriesType,error) { 
+  firstpart := string(fstype)
+  action := string(fslisttype)
+  
+  var returnerr error 
+  FileSystemEntries := FileSystemEntriesType{} 
+  if (v.SessionId != "") { 
+     vrr := v.MakeRequest(v.ConstructUrl(fmt.Sprintf("%s/%s/mounts/%s/%s?action=%s",firstpart,idstring,mountid,path,action)),"GET") 
+     xmlin, err := v.Request(vrr)
+     if err == nil {	
+     	err = xml.Unmarshal([]byte(xmlin),&FileSystemEntries)
+     	if err != nil {
+     	    returnerr = &VeeamRestError{"Unmarshal error FileSystemEntries",err.Error()}
+     	}
+     } else {	
+        returnerr = &VeeamRestError{"Invalid request asking FileSystemEntries",err.Error()}
+     }
+  } else { returnerr = &VeeamRestError{"No logon session set, did you login?",""} }
+  return FileSystemEntries,returnerr
+}
+

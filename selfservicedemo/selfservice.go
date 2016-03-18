@@ -6,9 +6,11 @@ import(
 	"flag"
 	"fmt"
 	"encoding/xml"
+	"crypto/tls"
+	"io"
 	//"io/ioutil"
 	//"os"
-	//"regexp"
+	"regexp"
 	"strings"
 	"net/url"
 	"sync"
@@ -18,6 +20,7 @@ import(
 	"time"
 	"strconv"
 	"bytes"
+	"sort"
 )
 
 
@@ -63,6 +66,11 @@ func NewJobEditType() (*JobEditType) {
   varType.XMLName.Space = "http://www.veeam.com/ent/v1.0"
   return &varType
 }
+
+type ByCreationTimeUTCRestoreSessionEntityType []*veeamrestapi.RestoreSessionEntityType
+func (a ByCreationTimeUTCRestoreSessionEntityType) Len() int           { return len(a) }
+func (a ByCreationTimeUTCRestoreSessionEntityType) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByCreationTimeUTCRestoreSessionEntityType) Less(i, j int) bool { return a[i].CreationTimeUTC < a[j].CreationTimeUTC }
 
 
 type HttpJobTaskSession struct {
@@ -116,17 +124,38 @@ type HttpBackupVMRestorePoint struct {
 	Name string
 	UID string
 	CreateUTC string
-	Algorithm string
-	PointType string
+	ParsedDate time.Time
 }
 type HttpBackupRestorePoint struct {
 	Name string
 	UID string
-
+	ParsedDate time.Time
 }
+
+type ByDateHttpBackupVMRestorePoint []*HttpBackupVMRestorePoint 
+func (a ByDateHttpBackupVMRestorePoint ) Len() int           { return len(a) }
+func (a ByDateHttpBackupVMRestorePoint ) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDateHttpBackupVMRestorePoint ) Less(i, j int) bool { return a[i].ParsedDate.Unix() < a[j].ParsedDate.Unix() }
+
+
+type ByDateHttpBackupRestorePoint []*HttpBackupRestorePoint 
+func (a ByDateHttpBackupRestorePoint) Len() int           { return len(a) }
+func (a ByDateHttpBackupRestorePoint) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDateHttpBackupRestorePoint) Less(i, j int) bool { return a[i].ParsedDate.Unix() < a[j].ParsedDate.Unix() }
+
+
 type HttpBackup struct {
 	Name string
 	UID string
+}
+
+type HttpMount struct {
+	Umount string
+	Up string
+	VmRestorePointId string
+	MountId string
+	Directories *veeamrestapi.DirectoryEntryListType
+	Files *veeamrestapi.FileEntryListType
 }
 
 type MainTemplate struct {
@@ -145,6 +174,8 @@ type MainTemplate struct {
 	Tasks []*veeamrestapi.TaskType
 	QuickBackup []*VM
 	BackupServer string
+	Mount *HttpMount
+	
 }
 type WorkStatus struct {
 	result string
@@ -152,6 +183,10 @@ type WorkStatus struct {
 	completed bool
 	idstring string
 	redirect string
+	download string
+	downloadFileName string
+	readyDownload bool
+	downloadGoback string
 }
 type Work struct {
 	Method string
@@ -232,28 +267,88 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.WorkListMutex.RLock()
 		defer h.WorkListMutex.RUnlock()
 		
-		var dots bytes.Buffer
-		dots.WriteString("Working on it")
-		waited := "/1"
-		if len(action) > 3 {
-			if i, err := strconv.ParseInt(action[3], 10, 64); err == nil {
-				for j := int64(0);j < i;j++ {
-					dots.WriteRune('.')
-				}
-				waited = fmt.Sprintf("/%d",(i+1))
-			}
-		}
+		
 		workstatus := (*h.WorkList)[action[2]]
 		if  workstatus != nil {
+		 if workstatus.download != "" && workstatus.readyDownload  {
+			//very unsafe case nobody cares about the mount
+			/*
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			CODE NOT TO BE THRUSTED
+			*/
+			h.l.Lock()
+			client := http.Client{}
+			if(h.rest.IgnoreSelfSigned) {
+				tr := &http.Transport{ TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+				client = http.Client{Transport: tr}
+			}
+			req, err1 := http.NewRequest("GET",workstatus.download, nil)
+			req.Header.Add("X-RestSvcSessionId",h.rest.RestSvcSessionId)
+			resp, err2 := client.Do(req)
+			h.l.Unlock()
+			
+			if err1 == nil && err2 == nil {
+				w.Header().Set("Content-Disposition", "attachment; filename='"+workstatus.downloadFileName+"'")
+				w.Header().Set("Content-Type", "application/octet-stream")
+				
+				//log.Println(workstatus.downloadFileName)
+				//resp.Body read
+				//w writer
+				chunk := make([]byte, 1024)
+				bread, err := resp.Body.Read(chunk)
+				var errout error
+				
+				
+				for err == nil && errout == nil {
+					_,errout = w.Write(chunk[:bread])
+					bread, err = resp.Body.Read(chunk)
+				}
+				if err == io.EOF && errout == nil {
+					_,errout = w.Write(chunk[:bread])
+				} 
+				resp.Body.Close()
+				
+
+			} else {
+				h.maintemplate.Execute(w,MainTemplate{Title:"Error",Customer:action[0],Content:(fmt.Sprintf("Internal error: <a href='%s'>Back to FLR session</a>",workstatus.downloadGoback)),Autorefresh:"3;URL=/"+action[0]})
+			}
+			
+		 } else if workstatus.download != "" && !workstatus.readyDownload  {
+			workstatus.readyDownload = true
+			h.maintemplate.Execute(w,MainTemplate{Title:"Working on it",Customer:action[0],Content:(fmt.Sprintf("<a href='%s'>Back to FLR session when download ends</a>",workstatus.downloadGoback)),Autorefresh:"2;URL=/"+action[0]+"/workprogress/"+workstatus.idstring})
+			
+			
+		 } else {
+			var dots bytes.Buffer
+			dots.WriteString("Working on it")
+			waited := "/1"
+			if len(action) > 3 {
+				if i, err := strconv.ParseInt(action[3], 10, 64); err == nil {
+					for j := int64(0);j < i;j++ {
+						dots.WriteRune('.')
+					}
+					waited = fmt.Sprintf("/%d",(i+1))
+				}
+			}
+		 
 			if workstatus.completed {
+				
 				jobmsg := "Job executed succesfully"
 				if !workstatus.success {
 					jobmsg = "Job didnt't execute succesfully. Message returned by worker : "+workstatus.result
 				}
+				
 				h.maintemplate.Execute(w,MainTemplate{Title:"Execution result",Customer:action[0],Content:jobmsg,Autorefresh:"2;URL="+workstatus.redirect})
 			} else {
 				h.maintemplate.Execute(w,MainTemplate{Title:"Working on it",Customer:action[0],Content:dots.String(),Autorefresh:"2;URL=/"+action[0]+"/workprogress/"+workstatus.idstring+waited})
 			}
+		  }
 		} else {
 			h.maintemplate.Execute(w,MainTemplate{Title:"Error",Customer:action[0],Content:"Error retrieving job",Autorefresh:"3;URL=/"+action[0]})
 		}
@@ -313,8 +408,49 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									task := veeamrestapi.TaskType{}
 									err = rest.GenericPostRequest(links[0].Href.String(),"",&task)
 									if err == nil {
-										h.maintemplate.Execute(w,MainTemplate{Title:"Job Started",Customer:prefix,Autorefresh:"2;URL=/"+prefix+"/showjobsessions/"+action[2],Content:(fmt.Sprintf("Succesfully started job %s",q.Name))})
-									}
+										h.WorkListMutex.Lock()
+										defer h.WorkListMutex.Unlock()
+										h.WorkListCounter = h.WorkListCounter+1
+										idstring := fmt.Sprintf("%s-%d",prefix,h.WorkListCounter)
+
+										status := WorkStatus{result:"Executing",success:false,completed:false,idstring:idstring,redirect:"/"+prefix+"/showjobsessions/"+action[2]}
+										(*h.WorkList)[idstring] = &status
+										
+										h.maintemplate.Execute(w,MainTemplate{Title:"Job started",Customer:prefix,Content:"Job start submited",Autorefresh:"1;URL=/"+prefix+"/workprogress/"+idstring})
+										
+										
+										go func(h *SelfService,workstatus * WorkStatus,taskid string) {									
+											h.l.Lock()
+											defer h.l.Unlock()
+										
+											task,err := h.rest.GetTask(taskid)
+											for err == nil && !strings.EqualFold(task.State,"Finished") {
+												time.Sleep(500*time.Millisecond)
+												task,err = h.rest.GetTask(taskid)
+											}
+											
+
+											h.WorkListMutex.Lock()
+											defer h.WorkListMutex.Unlock()
+											status.completed = true
+											
+											if err == nil {
+												if task.Result != nil && !task.Result.Success {
+													status.result = "Fail : "+task.Result.Message
+												} else if task.Result == nil {
+													status.result = "Fail but no message"
+												} else {
+													status.success = true
+													status.result = "Backup job started"
+												}
+											} else {
+												status.result = "Fail but internal error"
+											}
+										} (h,&status,task.TaskId)
+
+									} else {
+										h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
+									} 
 								}
 							} else {
 								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
@@ -327,8 +463,49 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									task := veeamrestapi.TaskType{}
 									err = rest.GenericPostRequest(links[0].Href.String(),"",&task)
 									if err == nil {
-										h.maintemplate.Execute(w,MainTemplate{Title:"Job Started",Customer:prefix,Autorefresh:"2;URL=/"+prefix+"/showjobsessions/"+action[2],Content:(fmt.Sprintf("Succesfully stopped job %s",q.Name))})
-									}
+										h.WorkListMutex.Lock()
+										defer h.WorkListMutex.Unlock()
+										h.WorkListCounter = h.WorkListCounter+1
+										idstring := fmt.Sprintf("%s-%d",prefix,h.WorkListCounter)
+
+										status := WorkStatus{result:"Executing",success:false,completed:false,idstring:idstring,redirect:"/"+prefix+"/showjobsessions/"+action[2]}
+										(*h.WorkList)[idstring] = &status
+										
+										h.maintemplate.Execute(w,MainTemplate{Title:"Job started",Customer:prefix,Content:"Job stop submited",Autorefresh:"1;URL=/"+prefix+"/workprogress/"+idstring})
+										
+										
+										go func(h *SelfService,workstatus * WorkStatus,taskid string) {									
+											h.l.Lock()
+											defer h.l.Unlock()
+										
+											task,err := h.rest.GetTask(taskid)
+											for err == nil && !strings.EqualFold(task.State,"Finished") {
+												time.Sleep(500*time.Millisecond)
+												task,err = h.rest.GetTask(taskid)
+											}
+											
+
+											h.WorkListMutex.Lock()
+											defer h.WorkListMutex.Unlock()
+											status.completed = true
+											
+											if err == nil {
+												if task.Result != nil && !task.Result.Success {
+													status.result = "Fail : "+task.Result.Message
+												} else if task.Result == nil {
+													status.result = "Fail but no message"
+												} else {
+													status.success = true
+													status.result = "Backup job stopped"
+												}
+											} else {
+												status.result = "Fail but internal error"
+											}
+										} (h,&status,task.TaskId)
+
+									} else {
+										h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
+									} 
 								}
 							} else {
 								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
@@ -691,12 +868,27 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 						break;	
 						case "showbackuppoints":
-							rps := veeamrestapi.RestorePointEntityListType{}
-							err = rest.GenericGetRequest("backups/"+action[2]+"/restorePoints?format=Entity",&rps)
+							rps := veeamrestapi.EntityReferenceListType{}
+							err = rest.GenericGetRequest("backups/"+action[2]+"/restorePoints",&rps)
 							if err == nil {
 								hrps := []*HttpBackupRestorePoint {}
-								for _,rp := range rps.RestorePoint {
-									hrps = append(hrps,&HttpBackupRestorePoint{rp.Name,rp.UID.Split()[2]})
+								dosort := true
+								for _,rp := range rps.Ref {
+									
+									const longForm  = "Jan 2 2006 3:04PM"
+									t,err := time.Parse(longForm,rp.Name )
+									if err != nil {
+										dosort = false
+										log.Println("Parse error :"+err.Error())
+										hrps = append(hrps,&HttpBackupRestorePoint{Name:rp.Name,UID:rp.UID.Split()[2]})
+									} else {
+										hrps = append(hrps,&HttpBackupRestorePoint{Name:rp.Name,UID:rp.UID.Split()[2],ParsedDate:t})
+									}
+									
+								}
+								if dosort {
+									log.Println("Sorting")
+									sort.Sort(sort.Reverse(ByDateHttpBackupRestorePoint(hrps)))
 								}
 								h.maintemplate.Execute(w,MainTemplate{Title:"Restorepoints",Customer:prefix,BackupRestorePoints:hrps})
 							} else {
@@ -704,39 +896,220 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 						break;
 						case "showbackuppointvm":
-							os := veeamrestapi.VmRestorePointEntityListType{}
-							//https://localhost:9398/api/restorePoints/0766c4c2-79da-4a38-b554-7e33be04b5b7/vmRestorePoints
-							/*
-								<VmRestorePoint Type="VmRestorePoint" Href="https://localhost:9398/api/vmRestorePoints/3e9ac9c0-dd79-4d3e-82e9-df78ef437034?format=Entity" Name="timocbt@2016-03-10 19:28:21" UID="urn:veeam:VmRestorePoint:3e9ac9c0-dd79-4d3e-82e9-df78ef437034">
-								<Links>
-								  <Link Href="https://localhost:9398/api/vmRestorePoints/3e9ac9c0-dd79-4d3e-82e9-df78ef437034?action=restore" Rel="Restore"/>
-								  <Link Href="https://localhost:9398/api/backupServers/1c47570a-27ac-4aab-9a84-8d88df1b86c8" Name="localhost" Type="BackupServerReference" Rel="Up"/>
-								  <Link Href="https://localhost:9398/api/restorePoints/0766c4c2-79da-4a38-b554-7e33be04b5b7" Name="Mar 10 2016  7:27PM" Type="RestorePointReference" Rel="Up"/>
-								  <Link Href="https://localhost:9398/api/vmRestorePoints/3e9ac9c0-dd79-4d3e-82e9-df78ef437034" Name="timocbt@2016-03-10 19:28:21" Type="VmRestorePointReference" Rel="Alternate"/>
-								  <Link Href="https://localhost:9398/api/vmRestorePoints/3e9ac9c0-dd79-4d3e-82e9-df78ef437034/mounts" Type="VmRestorePointMountList" Rel="Down"/>
-								  <Link Href="https://localhost:9398/api/vmRestorePoints/3e9ac9c0-dd79-4d3e-82e9-df78ef437034/mounts" Type="VmRestorePointMount" Rel="Create"/>
-								</Links>
-								<CreationTimeUTC>2016-03-10T19:28:21Z</CreationTimeUTC>
-								<Algorithm>Full</Algorithm>
-								<PointType>Full</PointType>
-								<HierarchyObjRef>urn:VMware:Vm:f49942ee-2098-4a6c-af36-be7e1c82458a.vm-14765</HierarchyObjRef>
-							*/
-							err = rest.GenericGetRequest("restorePoints/"+action[2]+"/vmRestorePoints?format=Entity",&os)
+							er := veeamrestapi.EntityReferenceListType{}
+							
+							err = rest.GenericGetRequest("restorePoints/"+action[2]+"/vmRestorePoints",&er)
 							if err == nil {
 								backupVMRestorePoints  := []*HttpBackupVMRestorePoint{}
-								for _,vrp := range os.VmRestorePoint {
+								sortbydate := true
+								for _,vrp := range er.Ref {
 									namesplit := strings.Split(vrp.Name,"@")
 									if len(namesplit) > 1 {
-										backupVMRestorePoints = append(backupVMRestorePoints,&HttpBackupVMRestorePoint{Name:namesplit[0],CreateUTC:vrp.CreationTimeUTC.TimeString(),Algorithm:vrp.Algorithm,PointType:vrp.PointType,UID:vrp.UID.Split()[2]})
+										const longForm  = "Jan 2 2006 3:04PM"
+										t,err := time.Parse(longForm,namesplit[1])
+										if err != nil {
+											sortbydate = false
+											backupVMRestorePoints = append(backupVMRestorePoints,&HttpBackupVMRestorePoint{Name:namesplit[0],CreateUTC:namesplit[1],UID:vrp.UID.Split()[2]})
+										} else {
+											backupVMRestorePoints = append(backupVMRestorePoints,&HttpBackupVMRestorePoint{Name:namesplit[0],ParsedDate:t,CreateUTC:namesplit[1],UID:vrp.UID.Split()[2]})
+										}
 									} else {
-										backupVMRestorePoints = append(backupVMRestorePoints,&HttpBackupVMRestorePoint{Name:vrp.Name,CreateUTC:vrp.CreationTimeUTC.TimeString(),Algorithm:vrp.Algorithm,PointType:vrp.PointType,UID:vrp.UID.Split()[2]})
+										sortbydate = false
+										backupVMRestorePoints = append(backupVMRestorePoints,&HttpBackupVMRestorePoint{Name:vrp.Name,CreateUTC:vrp.Name,UID:vrp.UID.Split()[2]})
 									}
+								}
+								if sortbydate {
+									sort.Sort(sort.Reverse(ByDateHttpBackupVMRestorePoint(backupVMRestorePoints)))
 								}
 								h.maintemplate.Execute(w,MainTemplate{Title:"Restorepoints",Customer:prefix,BackupVMRestorePoints:backupVMRestorePoints})
 							} else {
 								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
 							}
 						break;
+						case "flrrestore":
+							task := veeamrestapi.TaskType{}
+							err = rest.GenericPostRequest("vmRestorePoints/"+action[2]+"/mounts","",&task)
+							if err == nil {
+								h.WorkListMutex.Lock()
+								defer h.WorkListMutex.Unlock()
+								h.WorkListCounter = h.WorkListCounter+1
+								idstring := fmt.Sprintf("%s-%d",prefix,h.WorkListCounter)
+
+								status := WorkStatus{result:"Executing",success:false,completed:false,idstring:idstring,redirect:"/"+prefix}
+								(*h.WorkList)[idstring] = &status
+								
+							
+								
+								h.maintemplate.Execute(w,MainTemplate{Title:"FLR Mount Started",Customer:prefix,Content:"FLR Mount Started",Autorefresh:"1;URL=/"+prefix+"/workprogress/"+idstring})
+			
+								go func(h *SelfService,workstatus * WorkStatus,taskid string) {									
+									h.l.Lock()
+									defer h.l.Unlock()
+								
+									task,err := h.rest.GetTask(taskid)
+									for err == nil && !strings.EqualFold(task.State,"Finished") {
+										time.Sleep(500*time.Millisecond)
+										task,err = h.rest.GetTask(taskid)
+									}
+									
+
+									h.WorkListMutex.Lock()
+									defer h.WorkListMutex.Unlock()
+									status.completed = true
+									
+									if err == nil {
+										if task.Result != nil && !task.Result.Success {
+											status.result = "Fail : "+task.Result.Message
+										} else if task.Result == nil {
+											status.result = "Fail but no message"
+										} else {
+											status.success = true
+											//Name="5ea28175-8e10-47da-b480-133a794258c0@1"
+											links := veeamrestapi.FindLinkByType(task,"VmRestorePointMount")
+											if len(links) > 0 {
+												parts := strings.Split(links[0].Name,"@")
+												if len(parts) > 1 {
+													status.redirect = "/"+prefix+"/showmount/"+parts[0]+"/"+parts[1]
+												} else {
+													status.result = "Could not find mount"
+												}
+											} else {
+												status.result = "Session started but could not find follow up link"
+											}
+											
+											
+										}
+									} else {
+										status.result = "Fail but internal error"
+									}
+								} (h,&status,task.TaskId)
+							} else {
+								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
+							}
+						break
+						case "showmount":
+							
+							if len(action) > 3 {
+								mount := HttpMount{Umount:"/"+prefix+"/unmount/"+action[2]+"/"+action[3],VmRestorePointId:action[2],MountId:action[3]}
+
+								
+								if len(action) > 4 {
+									fpath := strings.Join(action[4:],"/")
+									up := "/"+prefix+"/showmount/"+action[2]+"/"+action[3]
+									if(len(fpath) > 5) {
+										up = up+"/"+strings.Join(action[4:len(action)-1],"/")
+									}
+									mount.Up = up
+									fse,err := rest.GetFileSystemEntries(veeamrestapi.FsBackup,action[2],action[3],fpath,veeamrestapi.ListAll)
+									if err == nil {							
+										mount.Directories = fse.Directories
+										mount.Files = fse.Files
+										h.maintemplate.Execute(w,MainTemplate{Title:"Root List",Customer:prefix,Mount:&mount})
+									} else {
+										h.maintemplate.Execute(w,MainTemplate{Title:"Error",Customer:prefix,Mount:&mount,Content:(fmt.Sprintf("Error %s <br>Please execute an umount",err))})
+									}
+								} else {
+									rpm,err := rest.GetVmRestorePointMount(action[2],action[3])
+									if err == nil {
+										mount.Directories = rpm.FSRoots
+										h.maintemplate.Execute(w,MainTemplate{Title:"Root List",Customer:prefix,Mount:&mount})
+									} else {
+										h.maintemplate.Execute(w,MainTemplate{Title:"Error",Customer:prefix,Mount:&mount,Content:(fmt.Sprintf("Error %s <br>Please execute an umount",err))})
+									}
+								}
+							} else {
+								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:("Need at least vmrestore id and mount id")})
+							}
+						break
+						case "download":
+							if len(action) > 4 {
+								//https://helpcenter.veeam.com/backup/80/rest/post_vmrestorepoints_id_mountpoints_id_filepath_actionrestore.html
+								fpath := strings.Join(action[4:],"/")
+								
+								goback := "/"+prefix+"/showmount/"+action[2]+"/"+action[3]
+								downloadFileName := action[len(action)-1]
+								
+								task := veeamrestapi.TaskType{}
+								restoreSpec := veeamrestapi.NewFileRestoreSpecType()
+								restoreSpec.ForDirectDownload = &veeamrestapi.FileRestoreSpecTypeNestedForDirectDownload{}
+								
+								
+								err = rest.GenericPostRequest("vmRestorePoints/"+action[2]+"/mounts/"+action[3]+"/"+fpath+"?action=restore",veeamrestapi.MarshalForPost(restoreSpec),&task)
+								if err == nil {
+									h.WorkListMutex.Lock()
+									defer h.WorkListMutex.Unlock()
+									h.WorkListCounter = h.WorkListCounter+1
+									idstring := fmt.Sprintf("%s-%d",prefix,h.WorkListCounter)
+
+									status := WorkStatus{result:"Executing",success:false,completed:false,idstring:idstring,redirect:"/"+prefix}
+									(*h.WorkList)[idstring] = &status
+									
+								
+									
+									h.maintemplate.Execute(w,MainTemplate{Title:"FLR Staging Started",Customer:prefix,Content:"FLR Staging Started",Autorefresh:"1;URL=/"+prefix+"/workprogress/"+idstring})
+				
+									go func(h *SelfService,workstatus * WorkStatus,taskid string, goback string, downloadFileName string) {									
+										h.l.Lock()
+										defer h.l.Unlock()
+									
+										task,err := h.rest.GetTask(taskid)
+										for err == nil && !strings.EqualFold(task.State,"Finished") {
+											time.Sleep(500*time.Millisecond)
+											task,err = h.rest.GetTask(taskid)
+										}
+										
+
+										h.WorkListMutex.Lock()
+										defer h.WorkListMutex.Unlock()
+										status.completed = true
+										
+										if err == nil {
+											if task.Result != nil && !task.Result.Success {
+												status.result = "Fail : "+task.Result.Message
+											} else if task.Result == nil {
+												status.result = "Fail but no message"
+											} else {
+												
+												
+												links := veeamrestapi.FindLinkByRel(task,"Download")
+												//log.Print(task.FullString(true,0))
+												
+												if len(links) > 0 {
+													download := links[0].Href
+													status.download = download.String()
+													status.downloadFileName = downloadFileName
+													status.readyDownload = false
+													status.downloadGoback = goback
+													status.success = true
+												} else {
+													status.result = "Download started but could not find follow up link"
+												}	
+											}
+										} else {
+											status.result = "Fail but internal error"
+										}
+									} (h,&status,task.TaskId,goback,downloadFileName)								
+								} else {
+									h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error restore %s",err)),Autorefresh:"3;URL=/"+prefix+"/umount/"+action[2]+"/"+action[3]})
+							    }
+							} else {
+								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:("Need at least vmrestore id, mount id and path")})
+							}
+						break
+						case "realdownload":
+						break;
+						case "unmount":
+							if len(action) > 3 {
+								_,err = rest.GenericDeleteXMLRequest("vmRestorePoints/"+action[2]+"/mounts/"+action[3])
+								if err == nil {
+									h.maintemplate.Execute(w,MainTemplate{Title:"Unmount succesful",Customer:prefix,Content:"Unmount succesful",Autorefresh:"1;URL=/"+prefix})
+								} else {
+									h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error unmounting %s",err)),Autorefresh:"3;URL=/"+prefix})
+								}
+							} else {
+								h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:("Need at least vmrestore id and mount id")})
+							}
+						break
 						case "fullvmrestore":
 							h.maintemplate.Execute(w,MainTemplate{Title:"Are you sure",Customer:prefix,Content:(fmt.Sprintf("Are you sure you sure? <a href='/%s/fullvmrestoreconfirm/%s'>YES</a> /  <a href='/%s'>NO</a>",prefix,action[2],prefix))})
 						break;
@@ -808,11 +1181,16 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 						break;
 						case "showrestoresessions":
-							sessions,err := rest.GetRestoreSessions()
+							//RestoreSessionEntityType
+							sessionlist,err := rest.GetRestoreSessions()
+							
+							mask := regexp.MustCompile("(?i)^(FLR_\\["+prefix+"[^@]*\\]|"+prefix+"[^@]*)@.*")
 							if err == nil {
+								sessions := sessionlist.RestoreSession
+								sort.Sort(sort.Reverse(ByCreationTimeUTCRestoreSessionEntityType(sessions)))
 								rs := []*HttpRestoreSession{}
-								for _,session := range sessions.RestoreSession {
-									if len(session.Name) > len(prefix) && strings.EqualFold(session.Name[:len(prefix)],prefix) {
+								for _,session := range sessions  {
+									if mask.MatchString(session.Name) {
 										rs = append(rs,&HttpRestoreSession{SessionUID:session.UID.Split()[2],Name:session.Name,JobType:session.JobType,CreateUTC:session.CreationTimeUTC.TimeString(),EndUTC:session.EndTimeUTC.TimeString(),State:session.State,Result:session.Result,Progress:session.Progress})
 									}
 								}
@@ -934,6 +1312,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 						break
 						case "showjobsessions":
+							
 							//https://localhost:9398/web/#/api/query?type=BackupJobSession&format=Entities&sortDesc=name&pageSize=10&page=1&filter=(JobUID==f7d731be-53f7-40ca-9c45-cbdaf29e2d99)
 							qget := url.Values{}
 							qget.Add("type","BackupJobSession")
@@ -1006,10 +1385,6 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				
 				
-				if err != nil {
-					h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:(fmt.Sprintf("Error %s",err))})
-					
-				}
 			} else {
 				h.maintemplate.Execute(w,MainTemplate{Title:"Error",Content:"Please supply 1 or 3 arguments e.g /prefix/action/id"})
 			}
@@ -1229,9 +1604,8 @@ func (h *SelfService) setTemplates() (error) {
 			{{ range $index, $element := .BackupVMRestorePoints }}
 				<tr><td class="namew">{{.Name}}</td>
 				<td style="width:200px">{{.CreateUTC}}</td>
-				<td>{{.Algorithm}}</td>
-				<td>{{.PointType}}</td>
 				<td class="iconwidth"><a href="/{{$customer}}/fullvmrestore/{{.UID}}"><img src="/___staticfilesrestore.png"/></a></td>
+				<td class="iconwidth"><a href="/{{$customer}}/flrrestore/{{.UID}}"><img src="/___staticfilesflr.png"/></a></td>
 				</tr>
 			{{end}}
 			</table>
@@ -1251,7 +1625,33 @@ func (h *SelfService) setTemplates() (error) {
 			{{else}}
 				Backup server not defined, should not happen
 			{{end}}
-		{{end}}		
+		{{end}}	
+		{{if .Mount}}
+			{{ $m := .Mount }}
+			{{if .Mount.Umount}}
+				<div><a href="{{.Mount.Umount}}">Unmount</a></div>
+			{{end}}
+			<table class="jobtable">
+			{{if .Mount.Up}}
+					<tr><td>Dir</td>	<td class="namew"><a href="{{.Mount.Up}}">..</a></td>		</tr>
+			{{end}}
+			{{if .Mount.Directories}}
+				
+				{{ range $i,$e := .Mount.Directories.DirectoryEntry}}
+					<tr><td>Dir</td>	<td class="namew"><a href="/{{$customer}}/showmount/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}">{{$e.Name}}</a></td>		
+					<td class="iconwidth"><a href="/{{$customer}}/download/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}"><img src="/___staticfilesdownload.png"/></a></td>
+					</tr>
+				{{end}}
+			{{end}}
+			{{if .Mount.Files}}
+				{{ range $i,$e := .Mount.Files.FileEntry}}
+					<tr><td>File</td>	<td class="namew">{{$e.Name}}</td>
+					<td class="iconwidth"><a href="/{{$customer}}/download/{{$m.VmRestorePointId}}/{{$m.MountId}}/{{$e.Path}}"><img src="/___staticfilesdownload.png"/></a></td>
+					</tr>
+				{{end}}
+			{{end}}
+			</table>
+		{{end}}
 		</div>
 	</body>
 </html>`
@@ -1283,6 +1683,8 @@ files["edit.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,2
 files["restore.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,21,0,0,0,21,8,6,0,0,0,169,23,165,150,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,2,14,73,68,65,84,56,141,213,213,191,75,27,97,24,192,241,239,93,2,77,114,33,13,105,41,196,210,40,87,2,197,130,63,22,193,77,93,4,21,255,1,55,39,137,99,150,44,78,78,1,103,227,34,18,17,116,16,116,10,184,100,144,44,130,154,205,37,180,18,181,73,35,73,27,147,11,38,241,210,183,131,244,236,113,137,45,141,14,125,166,123,238,121,222,207,221,243,114,188,39,9,33,4,79,28,118,128,139,250,5,105,45,221,53,54,236,30,38,224,8,220,163,105,45,205,114,118,185,107,116,169,119,137,128,35,128,220,181,212,38,254,31,212,254,55,77,62,187,15,255,11,63,138,172,112,213,188,34,215,200,253,59,218,231,232,35,244,54,196,216,203,49,100,233,97,168,204,109,134,149,203,21,78,170,39,109,215,117,28,127,212,51,74,252,67,156,9,239,132,9,4,8,58,131,196,130,49,230,253,243,143,163,242,111,190,234,84,137,190,143,162,216,148,142,83,200,146,76,168,39,196,148,111,202,82,51,198,15,191,11,51,224,30,32,249,61,201,184,119,28,151,236,50,154,178,245,44,91,133,45,26,162,193,140,111,134,17,207,136,81,139,244,70,56,170,30,81,186,43,89,223,52,173,165,81,29,42,11,61,11,244,43,253,70,67,241,174,72,248,83,152,189,226,30,137,82,130,197,204,34,137,82,194,168,187,100,23,115,111,230,218,143,127,92,61,70,23,58,54,201,102,106,240,216,60,236,126,220,101,210,55,9,128,64,16,189,140,82,209,43,70,207,236,235,89,211,58,3,45,235,101,110,244,27,203,254,52,69,147,245,252,58,7,223,14,140,123,181,86,141,253,210,190,145,123,237,94,6,149,65,43,10,144,170,164,16,60,28,90,90,75,99,231,122,135,88,46,102,121,216,97,249,208,148,15,185,135,58,160,229,20,90,75,51,192,237,235,109,214,114,107,22,16,224,172,118,134,46,116,35,87,157,170,113,109,250,248,79,181,83,108,146,141,90,171,70,188,16,103,35,191,209,22,132,251,109,89,253,178,138,64,160,181,52,178,245,44,211,175,166,173,104,253,71,157,243,219,115,146,229,36,241,175,241,142,224,175,216,44,108,154,242,182,40,64,228,115,132,124,51,255,71,240,177,144,132,16,226,169,79,126,233,57,254,81,63,1,34,2,199,116,21,146,251,10,0,0,0,0,73,69,78,68,174,66,96,130}
 files["vm.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,21,0,0,0,21,8,6,0,0,0,169,23,165,150,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,1,133,73,68,65,84,56,141,237,213,177,75,2,97,24,199,241,239,213,89,28,210,101,121,100,16,5,129,137,139,75,139,138,180,138,46,37,8,65,131,244,55,180,54,251,23,56,11,14,130,56,137,32,216,208,226,208,152,131,16,36,20,52,134,118,137,151,89,150,94,215,80,72,71,150,193,229,16,244,27,159,231,225,195,243,190,240,242,10,134,97,24,252,114,68,128,59,253,142,174,222,181,140,41,54,5,155,96,123,67,211,215,105,114,141,156,101,52,227,205,224,179,251,152,178,44,141,200,63,58,97,212,103,247,177,191,188,111,26,216,118,110,19,144,3,68,23,163,36,215,147,8,8,0,72,83,18,41,119,10,191,236,255,30,189,120,188,32,174,196,17,5,113,88,219,93,218,165,254,80,103,101,118,5,143,228,97,203,177,5,192,142,178,131,107,198,133,98,83,190,71,123,47,61,78,239,79,9,202,65,0,60,146,135,198,115,131,246,160,13,64,190,153,103,111,105,15,81,16,9,205,135,168,180,43,227,143,15,80,190,45,19,117,70,1,136,56,35,148,91,229,97,79,211,53,46,31,47,57,92,59,228,184,117,140,142,254,51,180,218,169,178,33,109,32,79,203,132,228,16,39,218,137,169,159,109,100,217,156,219,228,168,117,52,18,132,247,183,255,49,6,6,149,118,133,131,213,3,106,221,26,79,47,79,166,126,243,185,73,236,44,246,37,56,114,83,120,187,2,183,228,166,164,150,134,53,181,175,210,25,116,76,115,106,95,69,27,104,227,55,5,184,234,93,145,56,79,152,106,69,181,248,105,174,112,83,248,249,166,86,243,119,80,17,192,43,121,9,47,132,45,99,14,209,1,128,48,137,63,234,21,150,81,122,212,46,98,175,109,0,0,0,0,73,69,78,68,174,66,96,130}
 files["quickbackup.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,21,0,0,0,21,8,6,0,0,0,169,23,165,150,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,1,214,73,68,65,84,56,141,181,213,191,75,27,97,24,192,241,239,123,189,75,82,78,75,18,194,149,107,109,196,45,32,209,128,224,166,131,136,14,14,14,14,138,32,8,130,32,66,80,16,196,33,241,31,17,197,65,7,7,23,39,39,7,225,192,69,106,32,165,132,20,179,136,181,134,66,82,47,254,188,59,135,210,134,96,174,77,46,237,51,190,47,239,231,125,159,231,225,125,95,225,56,142,195,63,14,25,160,108,149,49,45,179,101,44,162,68,80,132,242,19,221,184,220,96,247,106,183,101,116,43,182,69,92,141,35,181,130,8,68,221,113,79,168,132,196,112,104,152,129,224,64,221,121,185,89,176,255,77,63,203,29,203,40,66,97,234,211,84,107,104,183,218,77,242,125,146,190,246,62,0,146,249,36,79,206,147,55,52,26,136,178,248,110,145,161,208,208,239,26,26,101,3,163,100,16,86,194,220,89,119,84,236,74,99,168,250,74,101,82,155,100,44,60,134,44,100,174,31,175,209,20,13,128,174,64,23,71,137,35,140,146,65,170,144,122,177,214,181,81,166,101,178,121,185,201,68,118,130,212,121,138,138,85,61,141,238,211,57,253,113,202,122,97,29,219,177,155,75,223,47,249,153,215,231,153,121,59,131,36,170,251,159,148,79,88,59,95,107,190,166,137,182,4,233,206,52,209,64,180,102,252,236,230,140,149,47,43,60,216,15,174,135,169,155,126,143,218,195,82,199,18,154,79,123,49,151,173,100,241,75,126,87,208,21,205,152,25,102,63,207,50,248,113,144,133,220,2,14,213,55,103,90,155,230,32,126,192,156,62,231,138,254,177,166,182,99,51,30,25,175,185,142,197,199,34,251,197,125,246,190,237,121,67,123,219,122,25,13,143,2,144,187,205,177,115,181,195,225,247,67,215,6,253,21,149,132,196,234,135,85,50,55,25,182,191,110,115,92,58,174,41,131,39,84,247,233,164,11,105,242,183,249,134,160,134,208,139,251,139,166,177,26,52,246,58,198,72,104,196,51,242,43,130,114,16,0,241,63,254,168,103,163,248,149,153,9,33,69,227,0,0,0,0,73,69,78,68,174,66,96,130}
+files["flr.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,21,0,0,0,21,8,6,0,0,0,169,23,165,150,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,0,220,73,68,65,84,56,141,237,149,47,14,194,48,20,135,191,49,72,104,2,134,3,128,193,32,17,19,187,2,98,110,135,65,32,150,9,12,146,243,112,0,204,14,0,134,10,78,208,176,101,75,246,16,36,16,72,25,127,54,28,159,106,210,254,190,246,37,47,175,142,136,8,13,211,6,208,153,38,49,73,109,217,180,55,101,216,29,94,164,137,73,136,15,113,109,233,98,180,184,73,31,81,45,69,199,233,88,131,89,153,145,75,94,41,183,74,231,163,57,179,193,204,26,216,108,55,172,221,53,26,253,84,218,170,188,210,134,129,112,31,50,102,220,160,20,56,153,19,193,46,96,34,19,235,190,181,252,42,124,223,199,243,60,0,250,166,79,116,140,234,75,149,82,215,181,155,187,214,51,95,149,255,138,191,244,47,109,24,107,243,47,15,75,86,122,245,50,92,72,241,190,52,45,83,82,210,79,30,119,135,35,34,210,244,228,119,126,241,71,157,1,12,73,68,107,188,228,61,107,0,0,0,0,73,69,78,68,174,66,96,130}
+files["download.png"] = []byte{137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,21,0,0,0,21,8,6,0,0,0,169,23,165,150,0,0,0,4,115,66,73,84,8,8,8,8,124,8,100,136,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,1,71,73,68,65,84,56,141,189,213,61,106,2,65,20,192,241,191,193,16,3,42,22,166,137,96,26,15,160,219,184,167,216,66,240,14,222,192,202,98,177,22,91,11,177,21,241,12,138,94,192,237,253,34,138,68,48,40,139,168,43,236,199,164,8,4,22,212,93,163,201,235,230,241,222,143,153,129,55,19,16,66,8,238,28,65,128,249,113,142,182,211,110,198,50,225,12,201,80,242,27,213,118,26,229,89,249,102,180,244,86,34,25,74,242,112,179,116,34,130,94,5,82,88,162,240,90,248,89,215,62,106,12,118,131,219,208,216,99,12,41,34,185,214,94,241,39,199,255,223,59,205,191,228,73,61,167,72,60,37,92,249,92,60,71,54,146,101,108,140,105,127,182,79,246,158,221,233,218,92,163,196,21,228,168,236,202,203,81,25,37,174,176,49,55,103,119,122,22,237,234,93,134,135,33,2,247,192,9,4,19,99,66,71,239,92,143,2,168,51,149,131,125,112,229,246,246,30,245,93,189,212,118,25,157,26,83,122,122,15,83,152,0,88,194,162,175,247,25,25,163,223,163,0,149,69,133,163,115,4,192,112,12,170,139,170,87,139,55,186,181,182,212,151,117,108,97,211,88,54,208,45,221,19,245,156,40,128,214,170,69,58,156,166,185,106,250,41,247,135,90,194,162,56,41,226,224,248,66,125,79,148,95,240,42,244,154,8,8,33,196,189,95,254,192,95,252,81,95,232,181,128,142,152,191,167,112,0,0,0,0,73,69,78,68,174,66,96,130}
 h.files = &files
 }
 
