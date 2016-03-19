@@ -294,7 +294,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			h.l.Unlock()
 			
 			if err1 == nil && err2 == nil {
-				w.Header().Set("Content-Disposition", "attachment; filename='"+workstatus.downloadFileName+"'")
+				w.Header().Set("Content-Disposition", "attachment; filename=\""+workstatus.downloadFileName+"\"")
 				w.Header().Set("Content-Type", "application/octet-stream")
 				
 				//log.Println(workstatus.downloadFileName)
