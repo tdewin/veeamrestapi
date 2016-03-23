@@ -298,6 +298,11 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Disposition", "attachment; filename=\""+workstatus.downloadFileName+"\"")
 				w.Header().Set("Content-Type", "application/octet-stream")
 				
+				length := resp.Header.Get("Content-Length")
+				if length != "" {
+					w.Header().Set("Content-Length", length)
+				}
+				
 				//log.Println(workstatus.downloadFileName)
 				//resp.Body read
 				//w writer
