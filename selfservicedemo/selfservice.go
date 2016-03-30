@@ -207,7 +207,11 @@ type SelfService struct {
 	WorkListCounter int
 }
 
-
+func (h *SelfService) UnlockedSleep(ms time.Duration) {
+	h.l.Unlock()
+	defer h.l.Lock()
+	time.Sleep(ms)
+}
 func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path,"/")
 	
@@ -430,8 +434,10 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											defer h.l.Unlock()
 										
 											task,err := h.rest.GetTask(taskid)
-											for err == nil && !strings.EqualFold(task.State,"Finished") {
-												time.Sleep(500*time.Millisecond)
+											for err == nil && strings.EqualFold(task.State,"Running") {
+												//time.Sleep(500*time.Millisecond)
+												h.UnlockedSleep(500*time.Millisecond)
+												
 												task,err = h.rest.GetTask(taskid)
 											}
 											
@@ -485,8 +491,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											defer h.l.Unlock()
 										
 											task,err := h.rest.GetTask(taskid)
-											for err == nil && !strings.EqualFold(task.State,"Finished") {
-												time.Sleep(500*time.Millisecond)
+											for err == nil && strings.EqualFold(task.State,"Running") {
+												h.UnlockedSleep(500*time.Millisecond)
 												task,err = h.rest.GetTask(taskid)
 											}
 											
@@ -647,8 +653,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												err = h.rest.GenericRequest("jobs/"+jobid+"/includes",&task,"POST",xml.Header+string(xmlpost))
 												if err == nil {
 													refreshok := true
-													for !strings.EqualFold(task.State,"Finished") && refreshok {
-														time.Sleep(refreshtasktime)
+													for strings.EqualFold(task.State,"Running") && refreshok {
+														h.UnlockedSleep(refreshtasktime)
 														task,err = h.rest.GetTask(task.TaskId)
 														if err != nil {
 															refreshok = false
@@ -695,7 +701,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													added = found
 												}
 												retry = retry - 1
-												time.Sleep(shortnaptime)
+												h.UnlockedSleep(shortnaptime)
 												log.Println("zzzzzZZZZZZzzzzzzzzz: short sleep")
 											}
 											if !added {
@@ -706,7 +712,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											}
 										} else {
 											log.Println("zzzzzZZZZZZzzzzzzzzz: long sleep")
-											time.Sleep(naptime)
+											h.UnlockedSleep(naptime)
 										}
 									}
 									
@@ -727,8 +733,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												err = h.rest.GenericRequest(link,&task,"DELETE","")
 												if err == nil {
 													refreshok := true
-													for !strings.EqualFold(task.State,"Finished") && refreshok {
-														time.Sleep(refreshtasktime)
+													for strings.EqualFold(task.State,"Running") && refreshok {
+														h.UnlockedSleep(refreshtasktime)
 														task,err = h.rest.GetTask(task.TaskId)
 														if err != nil {
 															refreshok = false
@@ -775,7 +781,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													deleted = !found
 												}
 												retry = retry - 1
-												time.Sleep(shortnaptime)
+												h.UnlockedSleep(shortnaptime)
 												log.Println("zzzzzZZZZZZzzzzzzzzz: short sleep")
 											}
 											if !deleted {
@@ -786,7 +792,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											}
 										} else {
 											log.Println("zzzzzZZZZZZzzzzzzzzz: long sleep")
-											time.Sleep(naptime)
+											h.UnlockedSleep(naptime)
 										}
 									}										
 									
@@ -804,8 +810,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										err = h.rest.GenericRequest("jobs/"+jobid,&task,"PUT",xml.Header+string(xmlpost))
 										if err == nil {
 											refreshok := true
-											for !strings.EqualFold(task.State,"Finished") && refreshok {
-												time.Sleep(refreshtasktime)
+											for strings.EqualFold(task.State,"Running") && refreshok {
+												h.UnlockedSleep(refreshtasktime)
 												task,err = h.rest.GetTask(task.TaskId)
 												if err != nil {
 													refreshok = false
@@ -843,7 +849,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												}
 											}
 											retry = retry - 1
-											time.Sleep(shortnaptime)
+											h.UnlockedSleep(shortnaptime)
 											log.Println("zzzzzZZZZZZzzzzzzzzz: short sleep")
 										}
 										if !mod {
@@ -854,7 +860,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										}
 									} else {
 										log.Println("zzzzzZZZZZZzzzzzzzzz: long sleep")
-										time.Sleep(naptime)
+										h.UnlockedSleep(naptime)
 									}
 									
 									h.WorkListMutex.Lock()
@@ -953,8 +959,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									defer h.l.Unlock()
 								
 									task,err := h.rest.GetTask(taskid)
-									for err == nil && !strings.EqualFold(task.State,"Finished") {
-										time.Sleep(500*time.Millisecond)
+									for err == nil && strings.EqualFold(task.State,"Running") {
+										h.UnlockedSleep(500*time.Millisecond)
 										task,err = h.rest.GetTask(taskid)
 									}
 									
@@ -1059,8 +1065,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										defer h.l.Unlock()
 									
 										task,err := h.rest.GetTask(taskid)
-										for err == nil && !strings.EqualFold(task.State,"Finished") {
-											time.Sleep(500*time.Millisecond)
+										for err == nil && strings.EqualFold(task.State,"Running") {
+											h.UnlockedSleep(500*time.Millisecond)
 											task,err = h.rest.GetTask(taskid)
 										}
 										
@@ -1141,8 +1147,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									defer h.l.Unlock()
 								
 									task,err := h.rest.GetTask(taskid)
-									for err == nil && !strings.EqualFold(task.State,"Finished") {
-										time.Sleep(500*time.Millisecond)
+									for err == nil && strings.EqualFold(task.State,"Running") {
+										h.UnlockedSleep(500*time.Millisecond)
 										task,err = h.rest.GetTask(taskid)
 									}
 									
@@ -1160,7 +1166,9 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											status.success = true
 											links := veeamrestapi.FindLinkByType(task,"RestoreSession")
 											if len(links) > 0 {
-												parts := strings.Split(strings.Trim(links[0].Href.S(),"?format=Entity"),"/")
+												parts := strings.Split(strings.TrimSuffix(links[0].Href.S(),"?format=Entity"),"/")
+												log.Printf("%v",links)
+												
 												status.redirect = "/"+prefix+"/showrestoresession/"+parts[(len(parts)-1)]
 											} else {
 												status.result = "Session started but could not find follow up link"
@@ -1210,7 +1218,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							if err == nil {
 								links := veeamrestapi.FindLinkByType(q,"BackupServerReference")
 								if len(links) > 0 {
-									BackupServerLink := strings.Split(strings.TrimLeft(links[0].Href.S(),"?format=Entity"),"/")
+									BackupServerLink := strings.Split(strings.TrimSuffix(links[0].Href.S(),"?format=Entity"),"/")
 									
 									vms := []*VM{}
 									if q.JobInfo.BackupJobInfo  != nil {
@@ -1263,8 +1271,8 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											defer h.l.Unlock()
 										
 											task,err := h.rest.GetTask(taskid)
-											for err == nil && !strings.EqualFold(task.State,"Finished") {
-												time.Sleep(500*time.Millisecond)
+											for err == nil && strings.EqualFold(task.State,"Running") {
+												h.UnlockedSleep(500*time.Millisecond)
 												task,err = h.rest.GetTask(taskid)
 											}
 											
@@ -1283,7 +1291,7 @@ func (h *SelfService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													links := veeamrestapi.FindLinkByType(task,"BackupJobSession")
 													log.Printf("%v",links)
 													if len(links) > 0 {
-														parts := strings.Split(strings.Trim(links[0].Href.S(),"?format=Entity"),"/")
+														parts := strings.Split(strings.TrimSuffix(links[0].Href.S(),"?format=Entity"),"/")
 														status.redirect = "/"+prefix+"/showbackupjobsession/"+parts[(len(parts)-1)]
 													} else {
 														status.result = "Session started but could not find follow up link"
@@ -1715,28 +1723,49 @@ func (h *SelfService) cacheStatic(logofile string) (error) {
 	return err
 }
 
-func (h *SelfService) cacheHierList() (error) {
+func (h *SelfService) cacheHierListNonDestruct(init bool) (error) {
 	rs, err := h.rest.GetHierarchyRoots()
 	vmlist := []*VM{}
 	if err == nil {
-		h.HierarchyRootCache = &rs.HierarchyRoot
-		for _,root := range (*h.HierarchyRootCache) {
+		allgood := true
+		
+		for _,root := range (rs.HierarchyRoot) {
 				urlg := url.Values{}
 				urlg.Add("host",root.UID.String())
 				urlg.Add("name","*")
 				urlg.Add("type","Vm")
 
-				vmsq,err := h.rest.GetLookup(urlg)
-				if err == nil {
+				vmsq,err2 := h.rest.GetLookup(urlg)
+				if err2 == nil {
 					for _,vmq := range vmsq.HierarchyItem {
 							vmlist = append(vmlist,&VM{Added:false,Name:vmq.ObjectName,UID:vmq.ObjectRef.String(),Root:root})
 					}
+				} else {
+					allgood = false 
 				}
 		}
-		h.VMs = &vmlist
-		h.CacheTime = time.Now()
+		if init || allgood {
+			h.HierarchyRootCache = &rs.HierarchyRoot
+			h.VMs = &vmlist
+			h.CacheTime = time.Now()
+		}
 	}
 	return err
+}
+func (h *SelfService) cacheHierList() (error) {
+	return h.cacheHierListNonDestruct(true)
+}
+
+
+
+func refreshCache(h *SelfService) {
+	for {
+		time.Sleep(500*time.Second)
+		h.l.Lock()
+		log.Printf("Refreshing cache")
+		h.cacheHierListNonDestruct(false)
+		h.l.Unlock()
+	}
 }
 func main() {
 	fserver := flag.String("server", "localhost", "Server hosting rest")
@@ -1784,6 +1813,7 @@ func main() {
 		
 			if err == nil {
 				log.Printf("Starting on http://localhost:%d",*fport)
+				go refreshCache(&selfservice)
 				http.Handle("/", &selfservice)
 				http.ListenAndServe(fmt.Sprintf(":%d",*fport), nil)
 			}
